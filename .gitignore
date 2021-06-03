@@ -130,6 +130,7 @@ moose/include/base/Precompiled.h.gch
 *~
 .*.swp
 .*.swo
+.ycm_extra_conf.py
 
 framework/contrib/exodiff/exodiff
 
