@@ -1,0 +1,24 @@
+name: phaethon
+channels:
+  - idaholab
+  - conda-forge
+dependencies:
+  - moose-libmesh
+  - moose-tools
+  - compiledb
+  - python-gmsh
+  - h5py
+  - ipython
+  - matplotlib
+  - numpy
+  - pip
+  - scipy
+  - vitables
+  - vtk
+  - pip:
+      # The next line installs a5py. This needs to be run from top level
+      # directory of Phaethon project
+      - ascot5-python/a5py
+variables:
+  EDITOR: vim
+  LD_LIBRARY_PATH: /home/mbluteau/work/projects/moose_fi_app/code/ascot5
