@@ -1,3 +1,7 @@
 [submodule "ascot5-python"]
 	path = ascot5-python
 	url = git@version.aalto.fi:ascot/python.git
+[submodule "moose"]
+	path = moose
+	url = git@github.com:idaholab/moose.git
+	branch = master
