@@ -1,0 +1,3 @@
+[submodule "ascot5-python"]
+	path = ascot5-python
+	url = git@version.aalto.fi:ascot/python.git
