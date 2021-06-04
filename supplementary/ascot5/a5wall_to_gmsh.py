@@ -18,12 +18,12 @@ def a5wall_to_gmsh(filename):
     input file but with the ``.e`` extension, and this file will be written in
     the directory from which the script is run.
 
+    \b
     Parameters
     ----------
     filename : str
         Input HDF5 file that holds the ASCOT5 wall mesh. It is assumed that the
         wall mesh is under the `wall/active` node of the HDF5 file.
-
     """
     
     # Read HDF5 ASCOT5 input file and get points and vertices
