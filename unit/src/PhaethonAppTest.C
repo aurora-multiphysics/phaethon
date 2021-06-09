@@ -17,6 +17,8 @@ TEST_F(PhaethonAppBasicTest, registryTest)
 {
 
   // Check we can find heat conduction
+  // TODO not sure what this is actually testing. Does not appear to be testing
+  // PhaethonApp, but rather PhaethonAppTest
   bool foundHeatConduction = Registry::isRegisteredObj("ADHeatConduction");
   EXPECT_TRUE(foundHeatConduction);
 
