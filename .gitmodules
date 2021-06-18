@@ -5,3 +5,6 @@
 	path = moose
 	url = git@github.com:idaholab/moose.git
 	branch = master
+[submodule "ascot5"]
+	path = ascot5
+	url = git@version.aalto.fi:ascot/ascot5.git
