@@ -5,6 +5,7 @@ channels:
 dependencies:
   - _libgcc_mutex=0.1=conda_forge
   - _openmp_mutex=4.5=1_gnu
+  - attrs=21.2.0=pyhd8ed1ab_0
   - backcall=0.2.0=pyh9f0ad1d_0
   - backports=1.0=py_2
   - backports.functools_lru_cache=1.6.4=pyhd8ed1ab_0
@@ -12,6 +13,7 @@ dependencies:
   - beautifulsoup4=4.9.3=pyhb0f4dca_0
   - binutils_impl_linux-64=2.35.1=h193b22a_2
   - binutils_linux-64=2.35=hc3fd857_29
+  - bleach=3.3.0=pyh44b312d_0
   - blosc=1.21.0=h9c3ff4c_0
   - bzip2=1.0.8=h7f98852_4
   - c-ares=1.17.1=h7f98852_1
@@ -28,6 +30,8 @@ dependencies:
   - dask-core=2021.5.1=pyhd8ed1ab_0
   - dbus=1.13.6=hfdff14a_1
   - decorator=5.0.9=pyhd8ed1ab_0
+  - defusedxml=0.7.1=pyhd8ed1ab_0
+  - entrypoints=0.3=pyhd8ed1ab_1003
   - expat=2.4.1=h9c3ff4c_0
   - flake8=3.9.2=pyhd8ed1ab_0
   - fontconfig=2.13.1=hba837de_1005
@@ -54,12 +58,20 @@ dependencies:
   - imageio=2.9.0=py_0
   - importlib-metadata=4.4.0=py37h89c1867_0
   - importlib_metadata=4.4.0=hd8ed1ab_0
+  - ipykernel=5.5.5=py37h085eea5_0
   - ipython=7.24.1=py37h085eea5_0
   - ipython_genutils=0.2.0=py_1
+  - ipywidgets=7.6.3=pyhd3deb0d_0
   - jedi=0.18.0=py37h89c1867_2
   - jinja2=3.0.1=pyhd8ed1ab_0
   - jpeg=9d=h36c2ea0_0
   - jsoncpp=1.8.4=hc9558a2_1002
+  - jsonschema=3.2.0=pyhd8ed1ab_3
+  - jupyter=1.0.0=py37h89c1867_6
+  - jupyter_client=6.1.12=pyhd8ed1ab_0
+  - jupyter_console=6.4.0=pyhd8ed1ab_0
+  - jupyter_core=4.7.1=py37h89c1867_0
+  - jupyterlab_widgets=1.0.0=pyhd8ed1ab_1
   - kernel-headers_linux-64=2.6.32=h77966d4_13
   - kiwisolver=1.3.1=py37h2527ec5_1
   - krb5=1.17.2=h926e7f8_0
@@ -94,6 +106,7 @@ dependencies:
   - libpq=12.3=h255efa7_3
   - libsm-cos6-x86_64=1.2.1=h9d98e8f_1104
   - libsm-devel-cos6-x86_64=1.2.1=h9d98e8f_1104
+  - libsodium=1.0.18=h36c2ea0_1
   - libssh2=1.9.0=ha56f1ee_6
   - libstdcxx-devel_linux-64=9.3.0=h4084dd6_17
   - libstdcxx-ng=9.3.0=h6de172a_19
@@ -128,6 +141,7 @@ dependencies:
   - mesa-libgl-devel-cos6-x86_64=11.0.7=h9d98e8f_1104
   - mesalib=18.3.1=h590aaf7_0
   - meshio=4.4.5=pyhd8ed1ab_0
+  - mistune=0.8.4=py37h5e8e339_1003
   - mock=4.0.3=py37h89c1867_1
   - moose-libmesh=2021.05.25=build_0
   - moose-libmesh-vtk=6.3.0=build_5
@@ -137,9 +151,12 @@ dependencies:
   - mpi=1.0=mpich
   - mysql-common=8.0.21=0
   - mysql-libs=8.0.21=h43e1182_0
+  - nbconvert=5.6.1=py37hc8dfbb8_1
+  - nbformat=5.1.3=pyhd8ed1ab_0
   - ncurses=6.2=h58526e2_4
   - netcdf4=1.5.1.2=py37h73a1b54_1
   - networkx=2.5=py_0
+  - notebook=5.7.10=py37hc8dfbb8_0
   - nspr=4.30=h9c3ff4c_0
   - nss=3.66=hb5efdd6_0
   - numexpr=2.7.3=py37hdc94413_0
@@ -147,7 +164,10 @@ dependencies:
   - occt=7.4.0=h9121d39_3
   - olefile=0.46=pyh9f0ad1d_1
   - openssl=1.1.1k=h7f98852_0
+  - packaging=20.9=pyh44b312d_0
   - pandas=1.2.4=py37h219a48f_0
+  - pandoc=2.14.0.2=h7f98852_0
+  - pandocfilters=1.4.2=py_1
   - parso=0.8.2=pyhd8ed1ab_0
   - partd=1.2.0=pyhd8ed1ab_0
   - pcre=8.44=he1b5a44_0
@@ -156,7 +176,9 @@ dependencies:
   - pillow=8.1.0=py37he6b4880_1
   - pip=21.1.2=pyhd8ed1ab_0
   - pkg-config=0.29.2=h36c2ea0_1008
+  - prometheus_client=0.11.0=pyhd8ed1ab_0
   - prompt-toolkit=3.0.18=pyha770c72_0
+  - prompt_toolkit=3.0.18=hd8ed1ab_0
   - pthread-stubs=0.4=h36c2ea0_1001
   - ptyprocess=0.7.0=pyhd3deb0d_0
   - pybtex=0.24.0=py37h89c1867_0
@@ -170,6 +192,7 @@ dependencies:
   - pyqt5-sip=4.19.18=py37hcd2ae1e_7
   - pyqtchart=5.12=py37he336c9b_7
   - pyqtwebengine=5.12.1=py37he336c9b_7
+  - pyrsistent=0.17.3=py37h5e8e339_2
   - pytables=3.6.1=py37h9f153d1_1
   - python=3.7.8=h8bdb77d_2_cpython
   - python-dateutil=2.8.1=py_0
@@ -178,12 +201,15 @@ dependencies:
   - pytz=2021.1=pyhd8ed1ab_0
   - pywavelets=1.1.1=py37h902c9e0_3
   - pyyaml=5.4.1=py37h5e8e339_0
+  - pyzmq=22.1.0=py37h336d617_0
   - qt=5.12.9=h1f2b2cb_0
+  - qtconsole=5.1.0=pyhd8ed1ab_0
   - qtpy=1.9.0=py_0
   - readline=8.1=h46c0cb4_0
   - rhash=1.4.1=h7f98852_0
   - scikit-image=0.17.2=py37hdc94413_4
   - scipy=1.6.3=py37h29e03ee_0
+  - send2trash=1.5.0=py_0
   - setuptools=49.6.0=py37h89c1867_3
   - shutilwhich=1.1.0=py_1
   - six=1.16.0=pyh6c4a22f_0
@@ -191,6 +217,8 @@ dependencies:
   - sqlite=3.35.5=h74cdb3f_0
   - sysroot_linux-64=2.12=h77966d4_13
   - tbb=2020.2=h4bd325d_4
+  - terminado=0.10.1=py37h89c1867_0
+  - testpath=0.5.0=pyhd8ed1ab_0
   - tifffile=2020.6.3=py_0
   - tk=8.6.10=h21135ba_1
   - toolz=0.11.1=py_0
@@ -200,7 +228,9 @@ dependencies:
   - vitables=3.0.2=py37h8f50634_1
   - vtk=8.2.0=py37hfdee58b_203
   - wcwidth=0.2.5=pyh9f0ad1d_2
+  - webencodings=0.5.1=py_1
   - wheel=0.36.2=pyhd3deb0d_0
+  - widgetsnbextension=3.5.1=py37h89c1867_4
   - xorg-fixesproto=5.0=h7f98852_1002
   - xorg-kbproto=1.0.7=h7f98852_1002
   - xorg-libice=1.0.10=h7f98852_0
@@ -219,6 +249,7 @@ dependencies:
   - xorg-xproto=7.0.31=h7f98852_1007
   - xz=5.2.5=h516909a_1
   - yaml=0.2.5=h516909a_0
+  - zeromq=4.3.4=h9c3ff4c_0
   - zipp=3.4.1=pyhd8ed1ab_0
   - zlib=1.2.11=h516909a_1010
   - zstd=1.4.4=h3b9ef0a_2
