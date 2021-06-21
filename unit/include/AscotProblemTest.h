@@ -26,7 +26,7 @@ protected:
     ASSERT_NE(executionerPtr, nullptr);
 
     // Get the FE problem
-    problemPtr = &(executionerPtr->feProblem());
+    problemPtr = dynamic_cast<AscotProblem *>(&(executionerPtr->feProblem()));
     ASSERT_NE(problemPtr, nullptr);
 
     // Check type (i.e. make sure this is an AscotProblem)
@@ -34,5 +34,5 @@ protected:
   }
 
   Executioner * executionerPtr = nullptr;
-  FEProblemBase * problemPtr = nullptr;
+  AscotProblem * problemPtr = nullptr;
 };

@@ -45,6 +45,8 @@ public:
    */
   virtual void addExternalVariables() override {}
 
+  std::vector<int> getWallTileHits();
+
 private:
   /// The name of the variable to transfer to
   const VariableName & _sync_to_var_name;

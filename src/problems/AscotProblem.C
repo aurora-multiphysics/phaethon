@@ -55,3 +55,10 @@ AscotProblem::syncSolutions(Direction direction)
   }
   return;
 }
+
+std::vector<int>
+AscotProblem::getWallTileHits()
+{
+  std::vector<int> walltile{0};
+  return walltile;
+}
