@@ -51,7 +51,25 @@ AscotProblem::syncSolutions(Direction direction)
 {
   if (direction == Direction::FROM_EXTERNAL_APP)
   {
-    return;
+    // Try to open the ASCOT5 HDF5 file
+    try
+    {
+      // Turn off the auto-printing when failure occurs so that we can
+      // handle the errors appropriately
+      Exception::dontPrint();
+
+      // Open an existing file and dataset.
+      H5File file(_ascot5_file_name, H5F_ACC_RDWR);
+
+    } // end of try block
+
+    // catch failure caused by the H5File operations
+    catch (FileIException error)
+    {
+      error.printErrorStack();
+      // TODO should pass the FileIException to MooseException somehow
+      throw MooseException("Failed to open ASCOT5 HDF5 file.");
+    }
   }
   return;
 }

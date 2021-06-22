@@ -11,6 +11,8 @@
 
 #include "ExternalProblem.h"
 #include "PhaethonApp.h"
+#include "H5Cpp.h"
+using namespace H5;
 
 class AscotProblem : public ExternalProblem
 {
@@ -48,8 +50,10 @@ public:
   std::vector<int> getWallTileHits();
 
 private:
-  /// The name of the variable to transfer to
+  /// The name of the AuxVariable to transfer to
   const VariableName & _sync_to_var_name;
-  /// The libMesh System object that contains
+  /// The Auxiliary system in which the heat flux values will be stored
   System & _problem_system;
+  /// The HDF5 file that is both the ASCOT5 input and output
+  const H5std_string & _ascot5_file_name = "ascot5.h5";
 };
