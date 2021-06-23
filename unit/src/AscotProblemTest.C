@@ -45,5 +45,5 @@ TEST_F(AscotProblemHDF5Test, read_walltile)
       196, 0,   373, 0,   0,   133, 293, 293, 0,   53,  0,   294, 391, 253, 0,   216, 356,
       236, 333, 116, 193, 253, 116, 293, 111, 334, 74,  356, 0,   236, 0,   0};
 
-  ASSERT_EQ(problemPtr->getWallTileHits(), simple_run_walltile);
+  ASSERT_EQ(problemPtr->getWallTileHits(hdf5_file), simple_run_walltile);
 }

@@ -58,10 +58,41 @@ AscotProblem::syncSolutions(Direction direction)
 }
 
 std::vector<int>
-AscotProblem::getWallTileHits()
+AscotProblem::getWallTileHits(H5File & hdf5_file)
 {
   std::vector<int> walltile{0};
+
+  // Open the results group
+  Group results_group = hdf5_file.openGroup("results");
+
+  // Check if the attribute 'active' is present
+  if (results_group.attrExists("active"))
+  {
+    // Open the attribute
+    H5::Attribute results_active_attr = results_group.openAttribute("active");
+    // Get its string type
+    StrType stype = results_active_attr.getStrType();
+    // Read the active run number into a string buffer
+    std::string active_result_num;
+    results_active_attr.read(stype, active_result_num);
+    // Open the active run group
+    std::string endstate_name = "run_" + active_result_num + "/endstate";
+    Group endstate_group = results_group.openGroup(endstate_name);
+    // Open the walltile dataset
+    DataSet walltile_ds = endstate_group.openDataSet("walltile");
+    // TODO current position: need to extract 1D array of "walltile" values
+  }
+  else
+  {
+    throw MooseException("ASCOT5 HDF5 File missing 'active' attribute.");
+  }
   return walltile;
+}
+
+std::vector<int>
+AscotProblem::getWallTileHits()
+{
+  return getWallTileHits(_ascot5_file);
 }
 
 H5File &
@@ -72,7 +103,7 @@ AscotProblem::getHDF5File(H5std_string file_name)
   {
     // Turn off the auto-printing when failure occurs so that we can
     // handle the errors appropriately
-    Exception::dontPrint();
+    // Exception::dontPrint();
 
     // Open an existing file in read only mode
     _ascot5_file = H5File(file_name, H5F_ACC_RDONLY);
