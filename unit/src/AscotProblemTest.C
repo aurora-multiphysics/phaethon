@@ -10,12 +10,6 @@
 #include "AscotProblemTest.h"
 #include <vector>
 
-class AscotProblemHDF5Test : public AscotProblemTest
-{
-protected:
-  AscotProblemHDF5Test() : AscotProblemTest("ascot_hdf5.i"){};
-};
-
 TEST_F(AscotProblemHDF5Test, read_walltile)
 {
 

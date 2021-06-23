@@ -27,7 +27,8 @@ AscotProblem::validParams()
 AscotProblem::AscotProblem(const InputParameters & parameters)
   : ExternalProblem(parameters),
     _sync_to_var_name(getParam<VariableName>("sync_variable")),
-    _problem_system(getAuxiliarySystem().system())
+    _problem_system(getAuxiliarySystem().system()),
+    _ascot5_file_name("ascot5.h5")
 {
 }
 
@@ -51,25 +52,7 @@ AscotProblem::syncSolutions(Direction direction)
 {
   if (direction == Direction::FROM_EXTERNAL_APP)
   {
-    // Try to open the ASCOT5 HDF5 file
-    try
-    {
-      // Turn off the auto-printing when failure occurs so that we can
-      // handle the errors appropriately
-      Exception::dontPrint();
-
-      // Open an existing file and dataset.
-      H5File file(_ascot5_file_name, H5F_ACC_RDWR);
-
-    } // end of try block
-
-    // catch failure caused by the H5File operations
-    catch (FileIException error)
-    {
-      error.printErrorStack();
-      // TODO should pass the FileIException to MooseException somehow
-      throw MooseException("Failed to open ASCOT5 HDF5 file.");
-    }
+    return;
   }
   return;
 }
@@ -79,4 +62,36 @@ AscotProblem::getWallTileHits()
 {
   std::vector<int> walltile{0};
   return walltile;
+}
+
+H5File &
+AscotProblem::getHDF5File(H5std_string file_name)
+{
+  // Try to open the ASCOT5 HDF5 file
+  try
+  {
+    // Turn off the auto-printing when failure occurs so that we can
+    // handle the errors appropriately
+    // Exception::dontPrint();
+
+    // Open an existing file
+    _ascot5_file = H5File(file_name, H5F_ACC_RDONLY);
+
+    return _ascot5_file;
+
+  } // end of try block
+
+  // catch failure caused by the H5File operations
+  catch (FileIException error)
+  {
+    error.printErrorStack();
+    // TODO should pass the FileIException to MooseException somehow
+    throw MooseException("Failed to open ASCOT5 HDF5 file.");
+  }
+}
+
+H5File &
+AscotProblem::getHDF5File()
+{
+  return getHDF5File(_ascot5_file_name);
 }

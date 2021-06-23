@@ -36,3 +36,25 @@ protected:
   Executioner * executionerPtr = nullptr;
   AscotProblem * problemPtr = nullptr;
 };
+
+class AscotProblemHDF5Test : public AscotProblemTest
+{
+protected:
+  AscotProblemHDF5Test() : AscotProblemTest("ascot_hdf5.i"){};
+
+  virtual void SetUp() override
+  {
+
+    // Call the base class method
+    ASSERT_NO_THROW(AscotProblemTest::SetUp());
+
+    // File name for HDF5 file with test data
+    H5std_string ascot5_file_name("inputs/simple_run.h5");
+
+    // Get the file
+    hdf5_file = problemPtr->getHDF5File(ascot5_file_name);
+    ASSERT_GE(hdf5_file.getId(), 0);
+  }
+
+  H5File hdf5_file;
+};

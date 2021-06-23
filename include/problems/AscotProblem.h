@@ -49,11 +49,15 @@ public:
 
   std::vector<int> getWallTileHits();
 
+  H5File & getHDF5File(H5std_string file_name);
+  H5File & getHDF5File();
+
 private:
   /// The name of the AuxVariable to transfer to
   const VariableName & _sync_to_var_name;
   /// The Auxiliary system in which the heat flux values will be stored
   System & _problem_system;
   /// The HDF5 file that is both the ASCOT5 input and output
-  const H5std_string & _ascot5_file_name = "ascot5.h5";
+  const H5std_string _ascot5_file_name;
+  H5File _ascot5_file;
 };
