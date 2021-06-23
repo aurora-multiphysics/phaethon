@@ -10,6 +10,29 @@
 #include "AscotProblemTest.h"
 #include <vector>
 
+TEST_F(AscotProblemHDF5Test, check_hdf5)
+{
+
+  ASSERT_FALSE(appIsNull);
+  // Check that the results group is present, then open it
+  ASSERT_TRUE(hdf5_file.nameExists("results"));
+  Group results_group = hdf5_file.openGroup("results");
+
+  // Check that the attribute 'active' is present, and then open
+  ASSERT_TRUE(results_group.attrExists("active"));
+  H5::Attribute results_active_attr = results_group.openAttribute("active");
+
+  // Get the string type from the attribute; this seems to be the only way to
+  // read a string in without declaring its size in advance
+  StrType stype = results_active_attr.getStrType();
+  // String buffer where attribute value will be stored
+  std::string active_result_num;
+  // Read the attribute value
+  results_active_attr.read(stype, active_result_num);
+  // Check that the active run number is as expected
+  ASSERT_EQ(active_result_num, "0069271660");
+}
+
 TEST_F(AscotProblemHDF5Test, read_walltile)
 {
 

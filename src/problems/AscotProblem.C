@@ -72,9 +72,9 @@ AscotProblem::getHDF5File(H5std_string file_name)
   {
     // Turn off the auto-printing when failure occurs so that we can
     // handle the errors appropriately
-    // Exception::dontPrint();
+    Exception::dontPrint();
 
-    // Open an existing file
+    // Open an existing file in read only mode
     _ascot5_file = H5File(file_name, H5F_ACC_RDONLY);
 
     return _ascot5_file;
