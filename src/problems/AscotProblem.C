@@ -57,10 +57,10 @@ AscotProblem::syncSolutions(Direction direction)
   return;
 }
 
-std::vector<int>
+std::vector<int64_t>
 AscotProblem::getWallTileHits(H5File & hdf5_file)
 {
-  std::vector<int> walltile{0};
+  std::vector<int64_t> walltile{0};
 
   // Open the results group
   Group results_group = hdf5_file.openGroup("results");
@@ -81,6 +81,18 @@ AscotProblem::getWallTileHits(H5File & hdf5_file)
     // Open the walltile dataset
     DataSet walltile_ds = endstate_group.openDataSet("walltile");
     // TODO current position: need to extract 1D array of "walltile" values
+    DataSpace walltile_dataspace = walltile_ds.getSpace();
+    // check we only have 1 dim
+    if (walltile_dataspace.getSimpleExtentNdims() == 1)
+    {
+      hssize_t n_markers = walltile_dataspace.getSimpleExtentNpoints();
+      walltile.resize(n_markers);
+      walltile_ds.read(walltile.data(), PredType::NATIVE_INT64);
+    }
+    else
+    {
+      throw MooseException("ASCOT5 HDF5 File walltile dataset of incorrect dim.");
+    }
   }
   else
   {
@@ -89,7 +101,7 @@ AscotProblem::getWallTileHits(H5File & hdf5_file)
   return walltile;
 }
 
-std::vector<int>
+std::vector<int64_t>
 AscotProblem::getWallTileHits()
 {
   return getWallTileHits(_ascot5_file);

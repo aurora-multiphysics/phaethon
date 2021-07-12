@@ -47,8 +47,8 @@ public:
    */
   virtual void addExternalVariables() override {}
 
-  std::vector<int> getWallTileHits(H5File & hdf5_file);
-  std::vector<int> getWallTileHits();
+  std::vector<int64_t> getWallTileHits(H5File & hdf5_file);
+  std::vector<int64_t> getWallTileHits();
 
   H5File & getHDF5File(H5std_string file_name);
   H5File & getHDF5File();

@@ -37,7 +37,7 @@ TEST_F(AscotProblemHDF5Test, read_walltile)
 {
 
   ASSERT_FALSE(appIsNull);
-  std::vector<int> simple_run_walltile{
+  std::vector<int64_t> simple_run_walltile{
       16,  376, 33,  0,   74,  0,   271, 16,  13,  256, 173, 53,  133, 311, 133, 133, 0,
       0,   56,  0,   0,   0,   0,   213, 93,  0,   213, 154, 0,   334, 76,  193, 0,   0,
       0,   0,   0,   213, 0,   151, 93,  0,   391, 296, 373, 274, 374, 0,   93,  0,   31,
