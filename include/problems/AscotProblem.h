@@ -48,10 +48,6 @@ public:
   virtual void addExternalVariables() override {}
 
   std::vector<int64_t> getWallTileHits(H5File & hdf5_file);
-  std::vector<int64_t> getWallTileHits();
-
-  H5File & getHDF5File(H5std_string file_name);
-  H5File & getHDF5File();
 
 private:
   /// The name of the AuxVariable to transfer to

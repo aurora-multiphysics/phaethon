@@ -51,9 +51,9 @@ protected:
     // File name for HDF5 file with test data
     H5std_string ascot5_file_name("inputs/simple_run.h5");
 
-    // Get the file
+    // Get the file and briefly check it
     EXPECT_TRUE(H5File::isHdf5(ascot5_file_name));
-    hdf5_file = problemPtr->getHDF5File(ascot5_file_name);
+    hdf5_file = H5File(ascot5_file_name, H5F_ACC_RDONLY);
     EXPECT_GE(hdf5_file.getId(), 0);
   }
 

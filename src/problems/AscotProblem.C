@@ -60,7 +60,6 @@ AscotProblem::syncSolutions(Direction direction)
 std::vector<int64_t>
 AscotProblem::getWallTileHits(H5File & hdf5_file)
 {
-  std::vector<int64_t> walltile{0};
 
   // Open the results group
   Group results_group = hdf5_file.openGroup("results");
@@ -79,15 +78,16 @@ AscotProblem::getWallTileHits(H5File & hdf5_file)
     std::string endstate_name = "run_" + active_result_num + "/endstate";
     Group endstate_group = results_group.openGroup(endstate_name);
     // Open the walltile dataset
-    DataSet walltile_ds = endstate_group.openDataSet("walltile");
-    // TODO current position: need to extract 1D array of "walltile" values
-    DataSpace walltile_dataspace = walltile_ds.getSpace();
+    DataSet walltile_dataset = endstate_group.openDataSet("walltile");
+    // Get the walltile dataset's data space
+    DataSpace walltile_dataspace = walltile_dataset.getSpace();
     // check we only have 1 dim
     if (walltile_dataspace.getSimpleExtentNdims() == 1)
     {
       hssize_t n_markers = walltile_dataspace.getSimpleExtentNpoints();
-      walltile.resize(n_markers);
-      walltile_ds.read(walltile.data(), PredType::NATIVE_INT64);
+      std::vector<int64_t> walltile(n_markers);
+      walltile_dataset.read(walltile.data(), PredType::NATIVE_INT64);
+      return walltile;
     }
     else
     {
@@ -98,43 +98,4 @@ AscotProblem::getWallTileHits(H5File & hdf5_file)
   {
     throw MooseException("ASCOT5 HDF5 File missing 'active' attribute.");
   }
-  return walltile;
-}
-
-std::vector<int64_t>
-AscotProblem::getWallTileHits()
-{
-  return getWallTileHits(_ascot5_file);
-}
-
-H5File &
-AscotProblem::getHDF5File(H5std_string file_name)
-{
-  // Try to open the ASCOT5 HDF5 file
-  try
-  {
-    // Turn off the auto-printing when failure occurs so that we can
-    // handle the errors appropriately
-    // Exception::dontPrint();
-
-    // Open an existing file in read only mode
-    _ascot5_file = H5File(file_name, H5F_ACC_RDONLY);
-
-    return _ascot5_file;
-
-  } // end of try block
-
-  // catch failure caused by the H5File operations
-  catch (FileIException error)
-  {
-    error.printErrorStack();
-    // TODO should pass the FileIException to MooseException somehow
-    throw MooseException("Failed to open ASCOT5 HDF5 file.");
-  }
-}
-
-H5File &
-AscotProblem::getHDF5File()
-{
-  return getHDF5File(_ascot5_file_name);
 }
