@@ -99,3 +99,10 @@ AscotProblem::getWallTileHits(H5File & hdf5_file)
     throw MooseException("ASCOT5 HDF5 File missing 'active' attribute.");
   }
 }
+
+std::vector<double_t>
+AscotProblem::getParticleEnergies(H5File & hdf5_file)
+{
+  std::vector<double_t> particle_energies{0.0};
+  return particle_energies;
+}
