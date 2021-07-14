@@ -57,10 +57,9 @@ AscotProblem::syncSolutions(Direction direction)
   return;
 }
 
-std::vector<int64_t>
-AscotProblem::getWallTileHits(H5File & hdf5_file)
+Group
+AscotProblem::getActiveEndstate(H5File & hdf5_file)
 {
-
   // Open the results group
   Group results_group = hdf5_file.openGroup("results");
 
@@ -77,22 +76,7 @@ AscotProblem::getWallTileHits(H5File & hdf5_file)
     // Open the active run group
     std::string endstate_name = "run_" + active_result_num + "/endstate";
     Group endstate_group = results_group.openGroup(endstate_name);
-    // Open the walltile dataset
-    DataSet walltile_dataset = endstate_group.openDataSet("walltile");
-    // Get the walltile dataset's data space
-    DataSpace walltile_dataspace = walltile_dataset.getSpace();
-    // check we only have 1 dim
-    if (walltile_dataspace.getSimpleExtentNdims() == 1)
-    {
-      hssize_t n_markers = walltile_dataspace.getSimpleExtentNpoints();
-      std::vector<int64_t> walltile(n_markers);
-      walltile_dataset.read(walltile.data(), PredType::NATIVE_INT64);
-      return walltile;
-    }
-    else
-    {
-      throw MooseException("ASCOT5 HDF5 File walltile dataset of incorrect dim.");
-    }
+    return endstate_group;
   }
   else
   {
@@ -100,9 +84,51 @@ AscotProblem::getWallTileHits(H5File & hdf5_file)
   }
 }
 
+std::vector<int64_t>
+AscotProblem::getWallTileHits(Group & endstate_group)
+{
+  // Open the walltile dataset
+  DataSet walltile_dataset = endstate_group.openDataSet("walltile");
+  // Get the walltile dataset's data space
+  DataSpace walltile_dataspace = walltile_dataset.getSpace();
+  // check we only have 1 dim
+  if (walltile_dataspace.getSimpleExtentNdims() == 1)
+  {
+    hssize_t n_markers = walltile_dataspace.getSimpleExtentNpoints();
+    std::vector<int64_t> walltile(n_markers);
+    walltile_dataset.read(walltile.data(), PredType::NATIVE_INT64);
+    return walltile;
+  }
+  else
+  {
+    throw MooseException("ASCOT5 HDF5 File walltile dataset of incorrect dim.");
+  }
+}
+
 std::vector<double_t>
-AscotProblem::getParticleEnergies(H5File & hdf5_file)
+AscotProblem::getParticleEnergies(Group & endstate_group)
 {
   std::vector<double_t> particle_energies{0.0};
+  // Open the datasets
+  // TODO better stratgy would be to get the number of markers or dimensions of
+  // each, then allocate the vectors, then read in each required array. I don't
+  // think it is needed to check that each has the correct number of points.
+  DataSet mass_dataset = endstate_group.openDataSet("mass");
+  DataSet vr_dataset = endstate_group.openDataSet("vr");
+  DataSet vphi_dataset = endstate_group.openDataSet("vphi");
+  DataSet vz_dataset = endstate_group.openDataSet("vz");
+  // Get the walltile dataset's data space
+  DataSpace walltile_dataspace = walltile_dataset.getSpace();
+  // check we only have 1 dim
+  if (walltile_dataspace.getSimpleExtentNdims() == 1)
+  {
+    hssize_t n_markers = walltile_dataspace.getSimpleExtentNpoints();
+    std::vector<int64_t> walltile(n_markers);
+    walltile_dataset.read(walltile.data(), PredType::NATIVE_INT64);
+  }
+  else
+  {
+    throw MooseException("ASCOT5 HDF5 File walltile dataset of incorrect dim.");
+  }
   return particle_energies;
 }

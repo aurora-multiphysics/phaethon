@@ -47,8 +47,9 @@ public:
    */
   virtual void addExternalVariables() override {}
 
-  std::vector<int64_t> getWallTileHits(H5File & hdf5_file);
-  std::vector<double_t> getParticleEnergies(H5File & hdf5_file);
+  Group getActiveEndstate(H5File & hdf5_file);
+  std::vector<int64_t> getWallTileHits(Group & endstate_group);
+  std::vector<double_t> getParticleEnergies(Group & endstate_group);
 
 private:
   /// The name of the AuxVariable to transfer to

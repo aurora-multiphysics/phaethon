@@ -37,6 +37,7 @@ TEST_F(AscotProblemHDF5Test, read_walltile)
 {
 
   ASSERT_FALSE(appIsNull);
+  Group endstate_group = problemPtr->getActiveEndstate(hdf5_file);
   std::vector<int64_t> simple_run_walltile{
       16,  376, 33,  0,   74,  0,   271, 16,  13,  256, 173, 53,  133, 311, 133, 133, 0,
       0,   56,  0,   0,   0,   0,   213, 93,  0,   213, 154, 0,   334, 76,  193, 0,   0,
@@ -45,13 +46,14 @@ TEST_F(AscotProblemHDF5Test, read_walltile)
       196, 0,   373, 0,   0,   133, 293, 293, 0,   53,  0,   294, 391, 253, 0,   216, 356,
       236, 333, 116, 193, 253, 116, 293, 111, 334, 74,  356, 0,   236, 0,   0};
 
-  ASSERT_EQ(problemPtr->getWallTileHits(hdf5_file), simple_run_walltile);
+  ASSERT_EQ(problemPtr->getWallTileHits(endstate_group), simple_run_walltile);
 }
 
 TEST_F(AscotProblemHDF5Test, read_energy)
 {
 
   ASSERT_FALSE(appIsNull);
+  Group endstate_group = problemPtr->getActiveEndstate(hdf5_file);
   std::vector<double_t> simple_run_energy{
       5.60972557e-13, 5.60061066e-13, 5.60617964e-13, 5.60794317e-13, 5.60486953e-13,
       5.60540727e-13, 5.60562110e-13, 5.60898525e-13, 4.81870660e-14, 5.60212366e-13,
@@ -74,5 +76,5 @@ TEST_F(AscotProblemHDF5Test, read_energy)
       5.60548715e-13, 5.60560665e-13, 5.60546715e-13, 5.60279440e-13, 5.60518951e-13,
       5.60665319e-13, 5.60504749e-13, 5.60472722e-13, 5.60104738e-13, 5.60696985e-13};
 
-  ASSERT_EQ(problemPtr->getParticleEnergies(hdf5_file), simple_run_energy);
+  ASSERT_EQ(problemPtr->getParticleEnergies(endstate_group), simple_run_energy);
 }
