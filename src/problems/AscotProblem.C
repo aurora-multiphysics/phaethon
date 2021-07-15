@@ -108,27 +108,39 @@ AscotProblem::getWallTileHits(Group & endstate_group)
 std::vector<double_t>
 AscotProblem::getParticleEnergies(Group & endstate_group)
 {
+
+  hssize_t n_markers;
   std::vector<double_t> particle_energies{0.0};
-  // Open the datasets
-  // TODO better stratgy would be to get the number of markers or dimensions of
-  // each, then allocate the vectors, then read in each required array. I don't
-  // think it is needed to check that each has the correct number of points.
+  // Open the one of the datasets to check the number of ions/markers
   DataSet mass_dataset = endstate_group.openDataSet("mass");
-  DataSet vr_dataset = endstate_group.openDataSet("vr");
-  DataSet vphi_dataset = endstate_group.openDataSet("vphi");
-  DataSet vz_dataset = endstate_group.openDataSet("vz");
-  // Get the walltile dataset's data space
-  DataSpace walltile_dataspace = walltile_dataset.getSpace();
-  // check we only have 1 dim
-  if (walltile_dataspace.getSimpleExtentNdims() == 1)
+  DataSpace mass_dataspace = mass_dataset.getSpace();
+  // Check we only have 1 dim
+  if (mass_dataspace.getSimpleExtentNdims() == 1)
   {
-    hssize_t n_markers = walltile_dataspace.getSimpleExtentNpoints();
-    std::vector<int64_t> walltile(n_markers);
-    walltile_dataset.read(walltile.data(), PredType::NATIVE_INT64);
+    hssize_t n_markers = mass_dataspace.getSimpleExtentNpoints();
   }
   else
   {
     throw MooseException("ASCOT5 HDF5 File walltile dataset of incorrect dim.");
   }
+  // Read in mass
+  std::vector<double_t> mass(n_markers);
+  mass_dataset.read(mass.data(), PredType::NATIVE_DOUBLE);
+  // Read in velocities
+  std::unordered_map<std::string, std::vector<double_t>> velocities;
+  std::vector<std::string> velocity_names{"vr", "vphi", "vz"};
+  for (auto && name : velocity_names)
+  {
+    velocities[name] = std::vector<double_t>(n_markers);
+    DataSet v_dataset = endstate_group.openDataSet(name);
+    v_dataset.read(velocities[name].data(), PredType::NATIVE_DOUBLE);
+  }
+
   return particle_energies;
+}
+
+double_t
+AscotProblem::calculateRelativisticEnergy(double_t mass, double_t velocity[3])
+{
+  return 0.0;
 }

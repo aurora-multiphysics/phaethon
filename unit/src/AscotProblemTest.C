@@ -78,3 +78,8 @@ TEST_F(AscotProblemHDF5Test, read_energy)
 
   ASSERT_EQ(problemPtr->getParticleEnergies(endstate_group), simple_run_energy);
 }
+
+TEST_F(AscotProblemHDF5Test, calculate_relativistic_energy)
+{
+  // TODO write this unit test to check AscotProblem::calculateRelativisticEnergy() method
+}

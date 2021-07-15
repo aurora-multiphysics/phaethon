@@ -47,9 +47,38 @@ public:
    */
   virtual void addExternalVariables() override {}
 
+  /**
+   * @brief Get the Active Endstate Group object
+   *
+   * @param hdf5_file
+   * @return Group
+   */
   Group getActiveEndstate(H5File & hdf5_file);
+
+  /**
+   * @brief Get the Wall Tile Hits
+   *
+   * @param endstate_group
+   * @return std::vector<int64_t>
+   */
   std::vector<int64_t> getWallTileHits(Group & endstate_group);
+
+  /**
+   * @brief Get the Particle Energies
+   *
+   * @param endstate_group
+   * @return std::vector<double_t>
+   */
   std::vector<double_t> getParticleEnergies(Group & endstate_group);
+
+  /**
+   * @brief Calculate the relativistic energy for a particle from velocities
+   *
+   * @param mass
+   * @param velocity
+   * @return double_t
+   */
+  double_t calculateRelativisticEnergy(double_t mass, double_t velocity[3]);
 
 private:
   /// The name of the AuxVariable to transfer to
