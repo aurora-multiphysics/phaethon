@@ -142,5 +142,7 @@ AscotProblem::getParticleEnergies(Group & endstate_group)
 double_t
 AscotProblem::calculateRelativisticEnergy(double_t mass, double_t velocity[3])
 {
-  return 0.0;
+  double_t magnitude = std::inner_product(velocity, velocity + 3, velocity, 0.0);
+  double_t gamma = 1.0 / sqrt(1.0 - magnitude / pow(constants::c, 2.0));
+  return (gamma - 1.0) * mass * constants::amu * pow(constants::c, 2.0);
 }

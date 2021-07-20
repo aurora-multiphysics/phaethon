@@ -81,5 +81,10 @@ TEST_F(AscotProblemHDF5Test, read_energy)
 
 TEST_F(AscotProblemHDF5Test, calculate_relativistic_energy)
 {
-  // TODO write this unit test to check AscotProblem::calculateRelativisticEnergy() method
+  // velocity components (r, phi, z) in m/s
+  double_t velocity[3] = {6726950.87616652, -9727805.12233284, 5355264.46022884};
+  // mass in amu
+  double_t mass = 4.0;
+  // relativistic energies compared in SI units (i.e. Joules)
+  ASSERT_DOUBLE_EQ(problemPtr->calculateRelativisticEnergy(mass, velocity), 5.605926430766929e-13);
 }

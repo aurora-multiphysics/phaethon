@@ -14,6 +14,12 @@
 #include "H5Cpp.h"
 using namespace H5;
 
+namespace constants
+{
+const double_t c = 299792458.0;
+const double_t amu = 1.6605390666e-27;
+}
+
 class AscotProblem : public ExternalProblem
 {
 public:
