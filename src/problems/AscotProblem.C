@@ -109,20 +109,17 @@ std::vector<double_t>
 AscotProblem::getParticleEnergies(Group & endstate_group)
 {
 
-  hssize_t n_markers;
-  std::vector<double_t> particle_energies{0.0};
+  std::vector<double_t> particle_energies;
   // Open the one of the datasets to check the number of ions/markers
   DataSet mass_dataset = endstate_group.openDataSet("mass");
   DataSpace mass_dataspace = mass_dataset.getSpace();
   // Check we only have 1 dim
-  if (mass_dataspace.getSimpleExtentNdims() == 1)
-  {
-    hssize_t n_markers = mass_dataspace.getSimpleExtentNpoints();
-  }
-  else
+  if (mass_dataspace.getSimpleExtentNdims() != 1)
   {
     throw MooseException("ASCOT5 HDF5 File walltile dataset of incorrect dim.");
   }
+  const hsize_t n_markers = mass_dataspace.getSimpleExtentNpoints();
+
   // Read in mass
   std::vector<double_t> mass(n_markers);
   mass_dataset.read(mass.data(), PredType::NATIVE_DOUBLE);
@@ -131,9 +128,20 @@ AscotProblem::getParticleEnergies(Group & endstate_group)
   std::vector<std::string> velocity_names{"vr", "vphi", "vz"};
   for (auto && name : velocity_names)
   {
-    velocities[name] = std::vector<double_t>(n_markers);
+    velocities[name].resize(n_markers);
     DataSet v_dataset = endstate_group.openDataSet(name);
     v_dataset.read(velocities[name].data(), PredType::NATIVE_DOUBLE);
+  }
+
+  std::vector<double_t> velocity;
+  for (hsize_t i = 0; i < n_markers; i++)
+  {
+    for (auto && name : velocity_names)
+    {
+      velocity.push_back(velocities[name][i]);
+    }
+    particle_energies.push_back(calculateRelativisticEnergy(mass[i], velocity.data()));
+    velocity.clear();
   }
 
   return particle_energies;
