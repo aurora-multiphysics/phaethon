@@ -52,7 +52,19 @@ AscotProblem::syncSolutions(Direction direction)
 {
   if (direction == Direction::FROM_EXTERNAL_APP)
   {
-    return;
+    // Open ASCOT5 file and relevant group
+    H5File ascot5_file(_ascot5_file_name, H5F_ACC_RDONLY);
+    Group ascot5_active_endstate = getActiveEndstate(ascot5_file);
+
+    // Get particle information
+    std::vector<int64_t> walltile = getWallTileHits(ascot5_active_endstate);
+    std::vector<double_t> energies = getParticleEnergies(ascot5_active_endstate);
+
+    /*
+    TODO
+      - Calculate heat flux values for each mesh element using walltile and energies
+      - Map these onto the AuxVariable in _problem_system
+    */
   }
   return;
 }

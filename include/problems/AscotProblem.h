@@ -56,33 +56,34 @@ public:
   /**
    * @brief Get the Active Endstate Group object
    *
-   * @param hdf5_file
-   * @return Group
+   * @param hdf5_file the ASCOT5 HDF5 file with output data.
+   * @return Group the HDF5 group object for the active endstate.
    */
   Group getActiveEndstate(H5File & hdf5_file);
 
   /**
-   * @brief Get the Wall Tile Hits
+   * @brief Get the indices of wall tiles that each particle has collided with
    *
-   * @param endstate_group
-   * @return std::vector<int64_t>
+   * @param endstate_group the HDF5 group object for the active endstate.
+   * @return std::vector<int64_t> the wall mesh elements that each particle has
+   * hit in this timestep. Indexed by particles.
    */
   std::vector<int64_t> getWallTileHits(Group & endstate_group);
 
   /**
    * @brief Get the Particle Energies
    *
-   * @param endstate_group
-   * @return std::vector<double_t>
+   * @param endstate_group the HDF5 group object for the active endstate.
+   * @return std::vector<double_t> the particles energies in Joules.
    */
   std::vector<double_t> getParticleEnergies(Group & endstate_group);
 
   /**
    * @brief Calculate the relativistic energy for a particle from velocities
    *
-   * @param mass
-   * @param velocity
-   * @return double_t
+   * @param mass the particle's mass in kg.
+   * @param velocity the particle's velocity vector in m/s.
+   * @return double_t the particle's energy in Joules
    */
   double_t calculateRelativisticEnergy(double_t mass, double_t velocity[3]);
 
