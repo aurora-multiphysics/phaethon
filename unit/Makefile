@@ -45,7 +45,7 @@ include           $(MOOSE_DIR)/modules/modules.mk
 ###############################################################################
 
 # Extra stuff for GTEST and HDF5
-ADDITIONAL_INCLUDES := -I$(FRAMEWORK_DIR)/contrib/gtest
+ADDITIONAL_INCLUDES := -I$(FRAMEWORK_DIR)/contrib/gtest -I/usr/include/hdf5/serial
 ADDITIONAL_LIBS     := $(FRAMEWORK_DIR)/contrib/gtest/libgtest.la -lhdf5_hl_cpp -lhdf5_cpp -lhdf5_hl -lhdf5
 
 # dep apps
