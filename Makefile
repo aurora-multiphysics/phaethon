@@ -50,7 +50,8 @@ include $(MOOSE_DIR)/modules/modules.mk
 ###############################################################################
 
 # Additional libraries for HDF5 support
-ADDITIONAL_LIBS := -lhdf5_hl_cpp -lhdf5_cpp -lhdf5_hl -lhdf5
+ADDITIONAL_INCLUDES := -I/usr/include/hdf5/serial
+ADDITIONAL_LIBS     := -lhdf5_hl_cpp -lhdf5_cpp -lhdf5_serial_hl -lhdf5_serial
 
 # dep apps
 APPLICATION_DIR    := $(CURDIR)
