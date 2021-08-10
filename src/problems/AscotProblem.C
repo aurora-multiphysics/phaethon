@@ -10,6 +10,7 @@
 // MOOSE includes
 #include "AscotProblem.h"
 #include "AuxiliarySystem.h"
+using namespace H5;
 
 registerMooseObject("PhaethonApp", AscotProblem);
 
@@ -70,7 +71,7 @@ AscotProblem::syncSolutions(Direction direction)
 }
 
 Group
-AscotProblem::getActiveEndstate(H5File & hdf5_file)
+AscotProblem::getActiveEndstate(const H5File & hdf5_file)
 {
   // Open the results group
   Group results_group = hdf5_file.openGroup("results");

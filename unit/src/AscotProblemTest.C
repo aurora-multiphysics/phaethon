@@ -10,6 +10,8 @@
 #include "AscotProblemTest.h"
 #include <vector>
 
+using namespace H5;
+
 TEST_F(AscotProblemHDF5Test, check_hdf5)
 {
 

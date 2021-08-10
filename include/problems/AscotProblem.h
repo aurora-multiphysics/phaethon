@@ -12,7 +12,6 @@
 #include "ExternalProblem.h"
 #include "PhaethonApp.h"
 #include "H5Cpp.h"
-using namespace H5;
 
 namespace constants
 {
@@ -59,7 +58,7 @@ public:
    * @param hdf5_file the ASCOT5 HDF5 file with output data.
    * @return Group the HDF5 group object for the active endstate.
    */
-  Group getActiveEndstate(H5File & hdf5_file);
+  H5::Group getActiveEndstate(const H5::H5File & hdf5_file);
 
   /**
    * @brief Get the indices of wall tiles that each particle has collided with
@@ -68,7 +67,7 @@ public:
    * @return std::vector<int64_t> the wall mesh elements that each particle has
    * hit in this timestep. Indexed by particles.
    */
-  std::vector<int64_t> getWallTileHits(Group & endstate_group);
+  std::vector<int64_t> getWallTileHits(H5::Group & endstate_group);
 
   /**
    * @brief Get the Particle Energies
@@ -76,7 +75,7 @@ public:
    * @param endstate_group the HDF5 group object for the active endstate.
    * @return std::vector<double_t> the particles energies in Joules.
    */
-  std::vector<double_t> getParticleEnergies(Group & endstate_group);
+  std::vector<double_t> getParticleEnergies(H5::Group & endstate_group);
 
   /**
    * @brief Calculate the relativistic energy for a particle from velocities
@@ -94,5 +93,5 @@ private:
   System & _problem_system;
   /// The HDF5 file that is both the ASCOT5 input and output
   const H5std_string _ascot5_file_name;
-  H5File _ascot5_file;
+  H5::H5File _ascot5_file;
 };
