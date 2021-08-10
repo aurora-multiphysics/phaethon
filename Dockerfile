@@ -15,6 +15,7 @@ ENV LD_LIBRARY_PATH=/home/ascot5 EDITOR=vim LC_ALL=C.UTF-8 LANG=C.UTF-8
 # ASCOT5 main C program and library
 RUN apt-get update && apt-get -y install make libhdf5-dev
 COPY ascot5 ./
+# This is a completely serial version with no MPI or OpenMP offloading to GPUs
 ENV MAKE_OPT='NOGIT=true CC=h5cc MPI=0 FLAGS=-foffload=disable'
 RUN make clean ${MAKE_OPT}} && make ascot5_main ${MAKE_OPT} && \
     make libascot ${MAKE_OPT} && \
@@ -31,3 +32,26 @@ RUN pip install ascot5-python/a5py
 FROM ascot5-moose-ubuntu AS phaethon-deps
 
 RUN pip install meshio[all] click
+
+##################################
+# Phaethon Development Environment
+##################################
+FROM phaethon-deps as phaethon-dev
+
+ENV METHOD=devel
+WORKDIR /home/moose
+# Update libMesh and PETSc
+RUN ./scripts/update_and_rebuild_petsc.sh --prefix=/home/petsc && \
+    ./scripts/update_and_rebuild_libmesh.sh --with-mpi
+# This is needed or it mpiexec complains because docker runs as root
+# Discussion on this issue https://github.com/open-mpi/ompi/issues/4451
+ENV OMPI_ALLOW_RUN_AS_ROOT=1
+ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
+# Re-build MOOSE framework in devel mode
+RUN cd test && make -j4 && ./run_tests -j4
+RUN cd modules && make -j4 && ./run_tests -j4
+
+RUN apt-get -y install clang-format curl
+RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && \
+    apt-get -y install git-lfs && \
+    git lfs install
