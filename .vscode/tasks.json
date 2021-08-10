@@ -1,0 +1,117 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Unit Tests",
+            "type": "shell",
+            "command": "make",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "options": {"shell": {"args": ["-ic"]}},
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "args": ["--directory=${workspaceFolder}/unit", "METHOD=devel", "-j4"],
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": ["absolute"],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "Makefike debug",
+            "type": "shell",
+            "command": "make",
+            "group": "none",
+            "options": {"shell": {"args": ["-ic"]}},
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "args": ["METHOD=dbg", "-j4"],
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": ["absolute"],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "Makefike clean",
+            "type": "shell",
+            "command": "make",
+            "group": "none",
+            "options": {"shell": {"args": ["-ic"]}},
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "args": ["clean"],
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": ["absolute"],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "Test",
+            "type": "shell",
+            "command": "./run_tests",
+            "group": "test",
+            "options": {"shell": {"args": ["-ic"]}},
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "args": ["-j4"]
+        },
+        {
+            "label": "Run Unit Tests",
+            "type": "shell",
+            "command": "./unit/run_tests",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "options": {"shell": {"args": ["-ic"]}},
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "args": ["-j4"]
+        }
+    ]
+}
