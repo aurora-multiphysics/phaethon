@@ -15,5 +15,6 @@
         "vector": "cpp"
     },
     "python.linting.flake8Enabled": true,
-    "python.linting.enabled": true
+    "python.linting.enabled": true,
+    "restructuredtext.languageServer.disabled": true
 }

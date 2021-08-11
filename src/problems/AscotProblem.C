@@ -10,6 +10,7 @@
 // MOOSE includes
 #include "AscotProblem.h"
 #include "AuxiliarySystem.h"
+#include <algorithm>
 using namespace H5;
 
 registerMooseObject("PhaethonApp", AscotProblem);
@@ -153,7 +154,7 @@ AscotProblem::getParticleEnergies(Group & endstate_group)
     {
       velocity.push_back(velocities[name][i]);
     }
-    particle_energies.push_back(calculateRelativisticEnergy(mass[i], velocity.data()));
+    particle_energies.push_back(calculateRelativisticEnergy(mass[i], velocity));
     velocity.clear();
   }
 
@@ -161,9 +162,13 @@ AscotProblem::getParticleEnergies(Group & endstate_group)
 }
 
 double_t
-AscotProblem::calculateRelativisticEnergy(double_t mass, double_t velocity[3])
+AscotProblem::calculateRelativisticEnergy(double_t mass, std::vector<double_t> velocity)
 {
-  double_t magnitude = std::inner_product(velocity, velocity + 3, velocity, 0.0);
-  double_t gamma = 1.0 / sqrt(1.0 - magnitude / pow(constants::c, 2.0));
-  return (gamma - 1.0) * mass * constants::amu * pow(constants::c, 2.0);
+
+  std::transform(velocity.begin(), velocity.end(), velocity.begin(), [](double_t & v) {
+    return v / constants::c;
+  });
+  double_t magnitude = std::inner_product(velocity.begin(), velocity.end(), velocity.begin(), 0.0);
+  double_t gamma = 1.0 / sqrt(1.0 - magnitude);
+  return (gamma - 1.0) * mass * constants::amu * constants::c * constants::c;
 }

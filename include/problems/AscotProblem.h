@@ -84,7 +84,7 @@ public:
    * @param velocity the particle's velocity vector in m/s.
    * @return double_t the particle's energy in Joules
    */
-  double_t calculateRelativisticEnergy(double_t mass, double_t velocity[3]);
+  static double_t calculateRelativisticEnergy(double_t mass, std::vector<double_t> velocity);
 
 private:
   /// The name of the AuxVariable to transfer to

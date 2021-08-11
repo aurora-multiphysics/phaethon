@@ -55,7 +55,6 @@ TEST_F(AscotProblemHDF5Test, read_energy)
 {
 
   ASSERT_FALSE(appIsNull);
-  Group endstate_group = problemPtr->getActiveEndstate(hdf5_file);
   std::vector<double_t> simple_run_energy{
       5.605926430766929e-13,  5.601051900561567e-13, 5.605507494388142e-13,  5.605521060424595e-13,
       5.605507494389468e-13,  5.605419474202633e-13, 5.605507494389468e-13,  5.605230803343478e-13,
@@ -83,13 +82,19 @@ TEST_F(AscotProblemHDF5Test, read_energy)
       5.605507494390794e-13,  5.602775486684352e-13, 5.605507494388142e-13,  5.605507494389468e-13,
       5.605442437704533e-13,  5.605507494393444e-13, 5.600653006044399e-13,  5.605565120199672e-13};
 
-  ASSERT_EQ(problemPtr->getParticleEnergies(endstate_group), simple_run_energy);
+  Group endstate_group = problemPtr->getActiveEndstate(hdf5_file);
+  std::vector<double_t> particle_energies = problemPtr->getParticleEnergies(endstate_group);
+
+  for (size_t i = 0; i < simple_run_energy.size(); i++)
+  {
+    ASSERT_DOUBLE_EQ(particle_energies[i], simple_run_energy[i]);
+  }
 }
 
 TEST_F(AscotProblemHDF5Test, calculate_relativistic_energy)
 {
   // velocity components (r, phi, z) in m/s
-  double_t velocity[3] = {6726950.87616652, -9727805.12233284, 5355264.46022884};
+  std::vector<double_t> velocity{6726950.87616652, -9727805.12233284, 5355264.46022884};
   // mass in amu
   double_t mass = 4.0;
   // relativistic energies compared in SI units (i.e. Joules)
