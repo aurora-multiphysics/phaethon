@@ -1,26 +1,15 @@
 #!/bin/bash
 # coding: utf-8
 
-# # Generate test data from ASCOT5 'simplerun'
-# 
-# Build docker image (if not already in existence) 
+# Generate test data from ASCOT5 'simplerun'
 
-cd ../../ascot5
-make docker
-
-# Generate the input file using a preprocessing script
-
-python3 ../ascot5-python/a5py/a5py/preprocessing/simpleruns.py
+python ../../ascot5-python/a5py/a5py/preprocessing/simpleruns.py
+mv helloworld.h5 simple_run.h5
 
 # Run ascot5 on input data
 
-./run_docker helloworld
+ascot5_main --in simple_run
 
-# Move output to this directory
+# Generate dummy mesh for use in MOOSE app
 
-mv helloworld.h5 ../supplementary/ascot5/simple_run.h5
-
-# # Generate dummy mesh for use in MOOSE app
-
-cd -
 ./a5wall_to_gmsh.py simple_run.h5

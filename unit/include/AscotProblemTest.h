@@ -26,7 +26,7 @@ protected:
     ASSERT_NE(executionerPtr, nullptr);
 
     // Get the FE problem
-    problemPtr = &(executionerPtr->feProblem());
+    problemPtr = dynamic_cast<AscotProblem *>(&(executionerPtr->feProblem()));
     ASSERT_NE(problemPtr, nullptr);
 
     // Check type (i.e. make sure this is an AscotProblem)
@@ -34,5 +34,24 @@ protected:
   }
 
   Executioner * executionerPtr = nullptr;
-  FEProblemBase * problemPtr = nullptr;
+  AscotProblem * problemPtr = nullptr;
+};
+
+class AscotProblemHDF5Test : public AscotProblemTest
+{
+protected:
+  AscotProblemHDF5Test()
+    : AscotProblemTest("ascot_hdf5.i"),
+      hdf5_file(H5::H5File("inputs/simple_run.h5", H5F_ACC_RDONLY)){};
+
+  virtual void SetUp() override
+  {
+    // Call the base class method
+    EXPECT_NO_THROW(AscotProblemTest::SetUp());
+
+    // Get the file and briefly check it
+    EXPECT_GE(hdf5_file.getId(), 0);
+  }
+
+  H5::H5File hdf5_file;
 };

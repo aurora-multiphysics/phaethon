@@ -1,0 +1,20 @@
+{
+    "files.associations": {
+        "*.C": "cpp",
+        "*.h": "cpp",
+        "cmath": "cpp",
+        "ratio": "cpp",
+        "*.tcc": "cpp",
+        "fstream": "cpp",
+        "iosfwd": "cpp",
+        "istream": "cpp",
+        "limits": "cpp",
+        "shared_mutex": "cpp",
+        "sstream": "cpp",
+        "streambuf": "cpp",
+        "vector": "cpp"
+    },
+    "python.linting.flake8Enabled": true,
+    "python.linting.enabled": true,
+    "restructuredtext.languageServer.disabled": true
+}

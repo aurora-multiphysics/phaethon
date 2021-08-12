@@ -11,6 +11,13 @@
 
 #include "ExternalProblem.h"
 #include "PhaethonApp.h"
+#include "H5Cpp.h"
+
+namespace constants
+{
+const double_t c = 299792458.0;
+const double_t amu = 1.6605390666e-27;
+}
 
 class AscotProblem : public ExternalProblem
 {
@@ -45,9 +52,46 @@ public:
    */
   virtual void addExternalVariables() override {}
 
+  /**
+   * @brief Get the Active Endstate Group object
+   *
+   * @param hdf5_file the ASCOT5 HDF5 file with output data.
+   * @return Group the HDF5 group object for the active endstate.
+   */
+  H5::Group getActiveEndstate(const H5::H5File & hdf5_file);
+
+  /**
+   * @brief Get the indices of wall tiles that each particle has collided with
+   *
+   * @param endstate_group the HDF5 group object for the active endstate.
+   * @return std::vector<int64_t> the wall mesh elements that each particle has
+   * hit in this timestep. Indexed by particles.
+   */
+  std::vector<int64_t> getWallTileHits(H5::Group & endstate_group);
+
+  /**
+   * @brief Get the Particle Energies
+   *
+   * @param endstate_group the HDF5 group object for the active endstate.
+   * @return std::vector<double_t> the particles energies in Joules.
+   */
+  std::vector<double_t> getParticleEnergies(H5::Group & endstate_group);
+
+  /**
+   * @brief Calculate the relativistic energy for a particle from velocities
+   *
+   * @param mass the particle's mass in kg.
+   * @param velocity the particle's velocity vector in m/s.
+   * @return double_t the particle's energy in Joules
+   */
+  static double_t calculateRelativisticEnergy(double_t mass, std::vector<double_t> velocity);
+
 private:
-  /// The name of the variable to transfer to
+  /// The name of the AuxVariable to transfer to
   const VariableName & _sync_to_var_name;
-  /// The libMesh System object that contains
+  /// The Auxiliary system in which the heat flux values will be stored
   System & _problem_system;
+  /// The HDF5 file that is both the ASCOT5 input and output
+  const H5std_string _ascot5_file_name;
+  H5::H5File _ascot5_file;
 };
