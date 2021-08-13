@@ -16,5 +16,6 @@
     },
     "python.linting.flake8Enabled": true,
     "python.linting.enabled": true,
-    "restructuredtext.languageServer.disabled": true
+    "restructuredtext.languageServer.disabled": true,
+    "python.pythonPath": "/usr/bin/python"
 }

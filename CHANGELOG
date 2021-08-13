@@ -1,0 +1,11 @@
+# CHANGELOG
+
+## v0.1.0 (2021-08-13)
+
+First release of PHAETHON.
+
+### Added
+
+- Docker build and development system
+- ASCOT5 and Python bindings build in Ubuntu 20.04-based Docker image along with PHAETHON MOOSE source
+- Ability to read HDF5 files produced by ASCOT5 and get particle energies and wall tile hits

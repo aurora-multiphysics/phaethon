@@ -33,6 +33,16 @@ FROM ascot5-moose-ubuntu AS phaethon-deps
 
 RUN pip install meshio[all] click
 
+##############################
+# Phaethon Release Build Stage
+##############################
+FROM phaethon-deps as phaethon
+
+WORKDIR /home/phaethon
+COPY ./ ./
+RUN git clean -dfx && make -j4 && make -C unit/ -j4 
+RUN cd unit && ./run_tests
+
 ##################################
 # Phaethon Development Environment
 ##################################
