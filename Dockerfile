@@ -33,16 +33,6 @@ FROM ascot5-moose-ubuntu AS phaethon-deps
 
 RUN pip install meshio[all] click
 
-##############################
-# Phaethon Release Build Stage
-##############################
-FROM phaethon-deps as phaethon
-
-WORKDIR /home/phaethon
-COPY ./ ./
-RUN git clean -dfx && make -j4 && make -C unit/ -j4 
-RUN cd unit && ./run_tests
-
 ##################################
 # Phaethon Development Environment
 ##################################
@@ -65,3 +55,31 @@ RUN apt-get -y install clang-format curl
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && \
     apt-get -y install git-lfs && \
     git lfs install
+
+ENV OMPI_ALLOW_RUN_AS_ROOT=
+ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=
+
+# Add a non-root user so git works inside the dev container
+ARG USERNAME=vscode
+ARG USER_UID=1002
+ARG USER_GID=$USER_UID
+
+# Create the user
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    #
+    # [Optional] Add sudo support. Omit if you don't need to install software after connecting.
+    && apt-get update \
+    && apt-get install -y sudo \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
+
+##############################
+# Phaethon Release Build Stage
+##############################
+FROM phaethon-deps as phaethon
+
+WORKDIR /home/phaethon
+COPY ./ ./
+RUN git clean -dfx && make -j4 && make -C unit/ -j4 
+RUN cd unit && ./run_tests
