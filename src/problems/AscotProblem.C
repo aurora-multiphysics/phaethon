@@ -62,6 +62,7 @@ AscotProblem::syncSolutions(Direction direction)
     std::vector<int64_t> walltile = getWallTileHits(ascot5_active_endstate);
     std::vector<double_t> energies = getParticleEnergies(ascot5_active_endstate);
 
+    // libMesh::Elem::volume
     /*
     TODO
       - Calculate heat flux values for each mesh element using walltile and energies
@@ -116,6 +117,27 @@ AscotProblem::getWallTileHits(Group & endstate_group)
   else
   {
     throw MooseException("ASCOT5 HDF5 File walltile dataset of incorrect dim.");
+  }
+}
+
+std::vector<double_t>
+AscotProblem::getMarkerWeights(Group & endstate_group)
+{
+
+  // Open the datasets to check the number of ions/markers
+  DataSet weight_dataset = endstate_group.openDataSet("weight");
+  DataSpace weight_dataspace = weight_dataset.getSpace();
+  // Check we only have 1 dim
+  if (weight_dataspace.getSimpleExtentNdims() == 1)
+  {
+    const hsize_t n_markers = weight_dataspace.getSimpleExtentNpoints();
+    std::vector<double_t> marker_weights(n_markers);
+    weight_dataset.read(marker_weights.data(), PredType::NATIVE_DOUBLE);
+    return marker_weights;
+  }
+  else
+  {
+    throw MooseException("ASCOT5 HDF5 File weight dataset is of incorrect dim.");
   }
 }
 

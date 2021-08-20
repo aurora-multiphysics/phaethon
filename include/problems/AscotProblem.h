@@ -70,6 +70,17 @@ public:
   static std::vector<int64_t> getWallTileHits(H5::Group & endstate_group);
 
   /**
+   * @brief Get the Marker Weights
+   *
+   * The "weight" of a marker represents the rate of particles tracked for this
+   * time step
+   *
+   * @param endstate_group the HDF5 group object for the active endstate.
+   * @return std::vector<double_t> the marker weights in units of markers/s.
+   */
+  static std::vector<double_t> getMarkerWeights(H5::Group & endstate_group);
+
+  /**
    * @brief Get the Particle Energies
    *
    * @param endstate_group the HDF5 group object for the active endstate.

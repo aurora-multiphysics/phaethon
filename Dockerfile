@@ -31,6 +31,7 @@ RUN pip install ascot5-python/a5py
 ###################################
 FROM ascot5-moose-ubuntu AS phaethon-deps
 
+# TODO put a requirements.txt file in repo instead of listing these here
 RUN pip install meshio[all] click
 
 ##################################
@@ -58,6 +59,10 @@ RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.d
 
 ENV OMPI_ALLOW_RUN_AS_ROOT=
 ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=
+
+# Python dev deps
+RUN python -m pip install -U flake8 --user
+ENV PATH="/root/.local/bin:${PATH}"
 
 # Add a non-root user so git works inside the dev container
 ARG USERNAME=vscode

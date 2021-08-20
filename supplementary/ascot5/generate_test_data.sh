@@ -13,3 +13,7 @@ ascot5_main --in simple_run
 # Generate dummy mesh for use in MOOSE app
 
 ./a5wall_to_gmsh.py simple_run.h5
+
+# Create text files from which unit test data was copied
+
+h5ls --data simple_run.h5/results/run_0069271660/endstate/weight > weight.txt

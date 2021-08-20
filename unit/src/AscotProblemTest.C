@@ -51,6 +51,25 @@ TEST_F(AscotProblemHDF5Test, read_walltile)
   ASSERT_EQ(problemPtr->getWallTileHits(endstate_group), simple_run_walltile);
 }
 
+TEST_F(AscotProblemHDF5Test, read_weights)
+{
+
+  ASSERT_FALSE(appIsNull);
+  std::vector<double_t> simple_run_weight{
+      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+
+  Group endstate_group = problemPtr->getActiveEndstate(hdf5_file);
+  std::vector<double_t> marker_weights = problemPtr->getMarkerWeights(endstate_group);
+
+  for (size_t i = 0; i < simple_run_weight.size(); i++)
+  {
+    ASSERT_DOUBLE_EQ(marker_weights[i], simple_run_weight[i]);
+  }
+}
+
 TEST_F(AscotProblemHDF5Test, read_energy)
 {
 
