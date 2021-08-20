@@ -97,6 +97,19 @@ public:
    */
   static double_t calculateRelativisticEnergy(double_t mass, std::vector<double_t> velocity);
 
+  /**
+   * @brief Calculate the heat flux values on each element of the mesh
+   *
+   * @param walltile the mesh element index that each marker has hit
+   * @param energies the energies of the markers in Joules
+   * @param weights the marker weights in units of markers/s
+   * @return std::vector<double_t> the heat flux incident on each element of the wall mesh in units
+   * of W/m^2
+   */
+  std::vector<double_t> calculateHeatFluxes(std::vector<int64_t> walltile,
+                                            std::vector<double_t> energies,
+                                            std::vector<double_t> weights);
+
 private:
   /// The name of the AuxVariable to transfer to
   const VariableName & _sync_to_var_name;

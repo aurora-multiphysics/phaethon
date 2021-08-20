@@ -52,7 +52,7 @@ ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 RUN cd test && make -j4 && ./run_tests -j4
 RUN cd modules && make -j4 && ./run_tests -j4
 
-RUN apt-get -y install clang-format curl
+RUN apt-get -y install clang-format curl hdf5-tools
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && \
     apt-get -y install git-lfs && \
     git lfs install

@@ -194,3 +194,12 @@ AscotProblem::calculateRelativisticEnergy(double_t mass, std::vector<double_t> v
   double_t gamma = 1.0 / sqrt(1.0 - magnitude);
   return (gamma - 1.0) * mass * constants::amu * constants::c * constants::c;
 }
+
+std::vector<double_t>
+AscotProblem::calculateHeatFluxes(std::vector<int64_t> walltile,
+                                  std::vector<double_t> energies,
+                                  std::vector<double_t> weights)
+{
+  std::vector<double_t> heat_fluxes(400);
+  return heat_fluxes;
+}
