@@ -32,7 +32,7 @@ RUN pip install ascot5-python/a5py
 FROM ascot5-moose-ubuntu AS phaethon-deps
 
 # TODO put a requirements.txt file in repo instead of listing these here
-RUN pip install meshio[all] click
+RUN pip install meshio[all] click jupyter
 
 ##################################
 # Phaethon Development Environment

@@ -1,9 +1,7 @@
 [Mesh]
-  type = GeneratedMesh
-  dim = 3
-  nx = 10
-  ny = 10
-  nz = 10
+  type = FileMesh
+  file = 'simple_run.inp'
+  allow_renumbering = false
 []
 
 [Problem]

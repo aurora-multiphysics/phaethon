@@ -200,6 +200,23 @@ AscotProblem::calculateHeatFluxes(std::vector<int64_t> walltile,
                                   std::vector<double_t> energies,
                                   std::vector<double_t> weights)
 {
-  std::vector<double_t> heat_fluxes(400);
+
+  // allocate heat flux storage based on number of elements in current mesh
+  std::vector<double_t> heat_fluxes(_mesh.nElem());
+
+  for (size_t i = 0; i < walltile.size(); i++)
+  {
+    if (walltile[i] > 0)
+    {
+      // TODO there is an off-by-one error with the test data and with
+      // `calculate.py` that needs to be resolved. The walltile variable is
+      // indexing from 1, but C++ and Python index from 0, so there is an
+      // "unused" element at the beginning of the test data array, and a missing
+      // element at the end. The creation of the test data didn't fail because
+      // there were no wall tile hits on the last element.
+      heat_fluxes[walltile[i] - 1] += energies[i] * weights[i] / _mesh.elemPtr(i)->volume();
+    }
+  }
+
   return heat_fluxes;
 }
