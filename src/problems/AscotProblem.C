@@ -204,6 +204,7 @@ AscotProblem::calculateHeatFluxes(std::vector<int64_t> walltile,
   // allocate heat flux storage based on number of elements in current mesh
   std::vector<double_t> heat_fluxes(_mesh.nElem());
 
+  // sum the energies incident on each walltile
   for (size_t i = 0; i < walltile.size(); i++)
   {
     if (walltile[i] > 0)
@@ -214,9 +215,14 @@ AscotProblem::calculateHeatFluxes(std::vector<int64_t> walltile,
       // "unused" element at the beginning of the test data array, and a missing
       // element at the end. The creation of the test data didn't fail because
       // there were no wall tile hits on the last element.
-      heat_fluxes[walltile[i] - 1] +=
-          energies[i] * weights[i] / _mesh.elemPtr(walltile[i] - 1)->volume();
+      heat_fluxes[walltile[i] - 1] += energies[i] * weights[i];
     }
+  }
+
+  // divide by tile area to get flux, done separately to reduce numerical errors
+  for (size_t i = 0; i < heat_fluxes.size(); i++)
+  {
+    heat_fluxes[i] /= _mesh.elemPtr(i)->volume();
   }
 
   return heat_fluxes;
