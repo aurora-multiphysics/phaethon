@@ -214,7 +214,8 @@ AscotProblem::calculateHeatFluxes(std::vector<int64_t> walltile,
       // "unused" element at the beginning of the test data array, and a missing
       // element at the end. The creation of the test data didn't fail because
       // there were no wall tile hits on the last element.
-      heat_fluxes[walltile[i] - 1] += energies[i] * weights[i] / _mesh.elemPtr(i)->volume();
+      heat_fluxes[walltile[i] - 1] +=
+          energies[i] * weights[i] / _mesh.elemPtr(walltile[i] - 1)->volume();
     }
   }
 

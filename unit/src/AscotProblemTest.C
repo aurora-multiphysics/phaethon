@@ -271,9 +271,11 @@ TEST_F(AscotProblemHDF5Test, calculate_heat_fluxes)
   std::vector<double_t> heat_fluxes =
       problemPtr->calculateHeatFluxes(simple_run_walltile, simple_run_energy, simple_run_weight);
 
+  double_t tol;
   for (size_t i = 0; i < simple_run_hfluxes.size(); i++)
   {
     std::cout << i << std::endl;
-    ASSERT_DOUBLE_EQ(heat_fluxes[i], simple_run_hfluxes[i]);
+    tol = simple_run_hfluxes[i] * 0.001;
+    ASSERT_NEAR(heat_fluxes[i], simple_run_hfluxes[i], tol);
   }
 }
