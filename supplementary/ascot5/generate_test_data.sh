@@ -14,6 +14,7 @@ ascot5_main --in simple_run
 
 ./a5wall_convert.py simple_run.h5 
 
-# Create text files from which unit test data was copied
+# Create other unit test data
 
-h5ls --data simple_run.h5/results/run_0069271660/endstate/weight > weight.txt
+python calculate_simple_run_particle_energies.py
+python calculate_simple_run_heat_fluxes.py
