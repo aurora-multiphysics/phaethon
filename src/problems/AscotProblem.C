@@ -29,7 +29,7 @@ AscotProblem::validParams()
 AscotProblem::AscotProblem(const InputParameters & parameters)
   : ExternalProblem(parameters),
     _sync_to_var_name(getParam<VariableName>("sync_variable")),
-    _problem_system(getAuxiliarySystem().system()),
+    _problem_system(getAuxiliarySystem()),
     _ascot5_file_name("ascot5.h5")
 {
 }
@@ -52,6 +52,17 @@ AscotProblem::externalSolve()
 void
 AscotProblem::syncSolutions(Direction direction)
 {
+  // TODO this works, but I'm not sure if it is the best place to check that the
+  // AuxVariable being passed is present in the system, and the use of
+  // MooseVariableFieldBase doesnt' feel correct. Also, should I be checking that the order of the
+  // variable is 1?
+  MooseVariableFieldBase & fi_heat_fluxes =
+      _problem_system.getVariable(_restartable_tid, _sync_to_var_name);
+  if (fi_heat_fluxes.isNodal())
+  {
+    throw MooseException("MooseVariable passed to AscotProblem is nodal. It must be elemental.");
+  }
+
   if (direction == Direction::FROM_EXTERNAL_APP)
   {
     // Open ASCOT5 file and relevant group
@@ -61,8 +72,11 @@ AscotProblem::syncSolutions(Direction direction)
     // Get particle information
     std::vector<int64_t> walltile = getWallTileHits(ascot5_active_endstate);
     std::vector<double_t> energies = getParticleEnergies(ascot5_active_endstate);
+    std::vector<double_t> weights = getMarkerWeights(ascot5_active_endstate);
 
-    // libMesh::Elem::volume
+    // Calculate the heat fluxes and tranfer to AuxVariable
+    std::vector<double_t> heat_fluxes = calculateHeatFluxes(walltile, energies, weights);
+
     /*
     TODO
       - Calculate heat flux values for each mesh element using walltile and energies
@@ -209,12 +223,6 @@ AscotProblem::calculateHeatFluxes(std::vector<int64_t> walltile,
   {
     if (walltile[i] > 0)
     {
-      // TODO there is an off-by-one error with the test data and with
-      // `calculate.py` that needs to be resolved. The walltile variable is
-      // indexing from 1, but C++ and Python index from 0, so there is an
-      // "unused" element at the beginning of the test data array, and a missing
-      // element at the end. The creation of the test data didn't fail because
-      // there were no wall tile hits on the last element.
       heat_fluxes[walltile[i] - 1] += energies[i] * weights[i];
     }
   }

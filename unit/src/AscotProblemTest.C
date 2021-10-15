@@ -12,6 +12,7 @@
 
 using namespace H5;
 
+// TODO this is ugly. Need to change!
 // Test data
 std::vector<int64_t> simple_run_walltile{
 #include "../../../supplementary/ascot5/walltile.csv"
@@ -116,4 +117,13 @@ TEST_F(AscotProblemHDF5Test, calculate_heat_fluxes)
     tol = simple_run_hfluxes[i] * 0.001;
     ASSERT_NEAR(heat_fluxes[i], simple_run_hfluxes[i], tol);
   }
+}
+
+// TODO this needs to be modified so the correct file is set internally within
+// the AscotProblem (perhaps this needs to be done earlier)
+TEST_F(AscotProblemHDF5Test, check_solution_sync)
+{
+  ASSERT_FALSE(appIsNull);
+
+  problemPtr->syncSolutions(ExternalProblem::Direction::FROM_EXTERNAL_APP);
 }

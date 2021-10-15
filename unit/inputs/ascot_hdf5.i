@@ -11,6 +11,7 @@
 
 [AuxVariables]
   [fi_heat_flux]
+    family = MONOMIAL
   []
 []
 
