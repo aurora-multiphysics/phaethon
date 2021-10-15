@@ -43,7 +43,8 @@ print(wall_load)
 print(np.equal(wall_load, heat_fluxes).all())
 
 
-# These don't match because there is an indexing error in the existing script that needs to be fixed. My answer above is correct.
+# These don't match because there is an indexing error in the existing script
+# that needs to be fixed. My answer above is correct.
 #
 # Finally, save to a file for future use in unit tests
 
@@ -53,7 +54,8 @@ print(np.equal(wall_load, heat_fluxes).all())
 np.savetxt('simple_run_heat_fluxes.csv', heat_fluxes, newline=', ')
 
 
-# And we should also save the walltile hit values and particle weights while we are here to complete the unit test data that is needed.
+# And we should also save the walltile hit values and particle weights while we
+# are here to complete the unit test data that is needed.
 
 # In[ ]:
 
