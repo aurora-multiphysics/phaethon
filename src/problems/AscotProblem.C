@@ -23,6 +23,8 @@ AscotProblem::validParams()
   params.addClassDescription("Retrieve fast ion heat fluxes from an external program");
   params.addRequiredParam<VariableName>(
       "sync_variable", "The variable that the external solution will be synced to");
+  params.addParam<FileName, FileName>(
+      "ascot5_file", "ascot5.h5", "The HDF5 input and output file for ASCOT5");
   return params;
 }
 
@@ -30,7 +32,7 @@ AscotProblem::AscotProblem(const InputParameters & parameters)
   : ExternalProblem(parameters),
     _sync_to_var_name(getParam<VariableName>("sync_variable")),
     _problem_system(getAuxiliarySystem()),
-    _ascot5_file_name("ascot5.h5")
+    _ascot5_file_name(getParam<FileName>("ascot5_file"))
 {
 }
 
@@ -56,11 +58,19 @@ AscotProblem::syncSolutions(Direction direction)
   // AuxVariable being passed is present in the system, and the use of
   // MooseVariableFieldBase doesnt' feel correct. Also, should I be checking that the order of the
   // variable is 1?
+  if (!_problem_system.hasVariable(_sync_to_var_name))
+  {
+    throw MooseException("AuxVariable " + _sync_to_var_name +
+                         " from input file is not present in the AuxiliarySystem. Make sure you "
+                         "have declared the AuxVariables block.");
+  }
   MooseVariableFieldBase & fi_heat_fluxes =
       _problem_system.getVariable(_restartable_tid, _sync_to_var_name);
-  if (fi_heat_fluxes.isNodal())
+
+  if (fi_heat_fluxes.isNodal() || fi_heat_fluxes.feType().order != 1)
   {
-    throw MooseException("MooseVariable passed to AscotProblem is nodal. It must be elemental.");
+    throw MooseException("MooseVariable passed to AscotProblem is nodal or of order >1. It must be "
+                         "elemental and order 1.");
   }
 
   if (direction == Direction::FROM_EXTERNAL_APP)
