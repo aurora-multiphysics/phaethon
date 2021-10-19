@@ -64,8 +64,8 @@ AscotProblem::syncSolutions(Direction direction)
                          " from input file is not present in the AuxiliarySystem. Make sure you "
                          "have declared the AuxVariables block.");
   }
-  MooseVariableFieldBase & fi_heat_fluxes =
-      _problem_system.getVariable(_restartable_tid, _sync_to_var_name);
+
+  auto & fi_heat_fluxes = _problem_system.getVariable(0, _sync_to_var_name);
 
   if (fi_heat_fluxes.isNodal() || fi_heat_fluxes.feType().order != 1)
   {
@@ -73,6 +73,7 @@ AscotProblem::syncSolutions(Direction direction)
                          "elemental and order 1.");
   }
 
+  // Get solution from ASCOT5 run
   if (direction == Direction::FROM_EXTERNAL_APP)
   {
     // Open ASCOT5 file and relevant group
@@ -84,14 +85,19 @@ AscotProblem::syncSolutions(Direction direction)
     std::vector<double_t> energies = getParticleEnergies(ascot5_active_endstate);
     std::vector<double_t> weights = getMarkerWeights(ascot5_active_endstate);
 
-    // Calculate the heat fluxes and tranfer to AuxVariable
+    // Calculate the heat fluxes
     std::vector<double_t> heat_fluxes = calculateHeatFluxes(walltile, energies, weights);
 
-    /*
-    TODO
-      - Calculate heat flux values for each mesh element using walltile and energies
-      - Map these onto the AuxVariable in _problem_system
-    */
+    // TODO there should be a fairly trivial 1:1 mapping here, but even so it
+    // might be safer to go through the mesh elemental DoF indicies
+    for (auto && i : fi_heat_fluxes.dofIndices())
+    {
+      fi_heat_fluxes.sys().solution().set(i, heat_fluxes[i]);
+    }
+
+    // Close and update solution to ensure consistency with other processes
+    fi_heat_fluxes.sys().solution().close();
+    fi_heat_fluxes.sys().update();
   }
   return;
 }

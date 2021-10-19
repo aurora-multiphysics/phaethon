@@ -9,6 +9,7 @@
 
 #include "AscotProblemTest.h"
 #include <vector>
+#include "SystemBase.h"
 
 using namespace H5;
 
@@ -119,11 +120,28 @@ TEST_F(AscotProblemHDF5Test, calculate_heat_fluxes)
   }
 }
 
-// TODO this needs to be modified so the correct file is set internally within
-// the AscotProblem (perhaps this needs to be done earlier)
+/*
+TEST_F(AscotProblemHDF5Test, check_auxvariable)
+{
+  // It looks like I need to think more about the distributed nature of the
+  // AuxVariable and mesh. I need to sum over all of the threads and probably
+  // processes?
+  ASSERT_EQ(problemPtr->getAuxiliarySystem()., (unsigned int)400);
+}
+*/
+
+// TODO need to get this test passing
 TEST_F(AscotProblemHDF5Test, check_solution_sync)
 {
   ASSERT_FALSE(appIsNull);
-
   problemPtr->syncSolutions(ExternalProblem::Direction::FROM_EXTERNAL_APP);
+  auto & auxvar_heat_fluxes = problemPtr->getVariable(0, "fi_heat_flux");
+
+  double_t tol;
+  for (size_t i = 0; i < simple_run_hfluxes.size(); i++)
+  {
+    // set the relative tolerance to 0.1%
+    tol = simple_run_hfluxes[i] * 0.001;
+    ASSERT_NEAR(auxvar_heat_fluxes.sys().solution().el(i), simple_run_hfluxes[i], tol);
+  }
 }
