@@ -136,12 +136,16 @@ TEST_F(AscotProblemHDF5Test, check_solution_sync)
   ASSERT_FALSE(appIsNull);
   problemPtr->syncSolutions(ExternalProblem::Direction::FROM_EXTERNAL_APP);
   auto & auxvar_heat_fluxes = problemPtr->getVariable(0, "fi_heat_flux");
-
+  MeshBase & to_mesh = auxvar_heat_fluxes.sys().mesh().getMesh();
   double_t tol;
-  for (size_t i = 0; i < simple_run_hfluxes.size(); i++)
+  int64_t id;
+  dof_id_type dof_i;
+  for (const auto & el : to_mesh.element_ptr_range())
   {
+    id = el->id();
     // set the relative tolerance to 0.1%
-    tol = simple_run_hfluxes[i] * 0.001;
-    ASSERT_NEAR(auxvar_heat_fluxes.sys().solution().el(i), simple_run_hfluxes[i], tol);
+    tol = simple_run_hfluxes[id] * 0.001;
+    dof_i = el->dof_number(auxvar_heat_fluxes.sys().number(), auxvar_heat_fluxes.number(), 0);
+    ASSERT_NEAR(auxvar_heat_fluxes.sys().solution().el(dof_i), simple_run_hfluxes[id], tol);
   }
 }

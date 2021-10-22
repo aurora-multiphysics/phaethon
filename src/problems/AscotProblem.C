@@ -65,9 +65,10 @@ AscotProblem::syncSolutions(Direction direction)
                          "have declared the AuxVariables block.");
   }
 
-  auto & fi_heat_fluxes = _problem_system.getVariable(0, _sync_to_var_name);
+  // ExternalProblem's are not threaded, so pass thread 0
+  auto & sync_to_var = _problem_system.getVariable(0, _sync_to_var_name);
 
-  if (fi_heat_fluxes.isNodal() || fi_heat_fluxes.feType().order != 1)
+  if (sync_to_var.isNodal() || sync_to_var.feType().order != 1)
   {
     throw MooseException("MooseVariable passed to AscotProblem is nodal or of order >1. It must be "
                          "elemental and order 1.");
@@ -88,18 +89,27 @@ AscotProblem::syncSolutions(Direction direction)
     // Calculate the heat fluxes
     std::vector<double_t> heat_fluxes = calculateHeatFluxes(walltile, energies, weights);
 
+    // Get the mesh
+    MeshBase & to_mesh = mesh().getMesh();
+
+    dof_id_type dof_i;
     // TODO there should be a fairly trivial 1:1 mapping here, but even so it
     // might be safer to go through the mesh elemental DoF indicies
-    for (auto && i : fi_heat_fluxes.dofIndices())
+    for (const auto & el : to_mesh.active_local_element_ptr_range())
     {
-      fi_heat_fluxes.sys().solution().set(i, heat_fluxes[i]);
+      dof_i = el->dof_number(sync_to_var.sys().number(), sync_to_var.number(), 0);
+      _console << "el_dof: " << dof_i << ", el_id: " << el->id()
+               << ", flux: " << heat_fluxes[el->id()] << std::endl;
+      sync_to_var.sys().solution().set(dof_i, heat_fluxes[el->id()]);
     }
 
     // Close and update solution to ensure consistency with other processes
-    fi_heat_fluxes.sys().solution().close();
-    fi_heat_fluxes.sys().update();
+    // TODO for some reason, the AuxVariable is not getting picked up in unit test, nor in Exodus
+    // output from a full run. Is this to do with the fact that I don't have a nonlinear Variable
+    // and therefore no System?
+    sync_to_var.sys().solution().close();
+    sync_to_var.sys().update();
   }
-  return;
 }
 
 Group
