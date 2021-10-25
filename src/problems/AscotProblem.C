@@ -55,9 +55,7 @@ void
 AscotProblem::syncSolutions(Direction direction)
 {
   // TODO this works, but I'm not sure if it is the best place to check that the
-  // AuxVariable being passed is present in the system, and the use of
-  // MooseVariableFieldBase doesnt' feel correct. Also, should I be checking that the order of the
-  // variable is 1?
+  // AuxVariable being passed is present in the system
   if (!_problem_system.hasVariable(_sync_to_var_name))
   {
     throw MooseException("AuxVariable " + _sync_to_var_name +
@@ -68,10 +66,11 @@ AscotProblem::syncSolutions(Direction direction)
   // ExternalProblem's are not threaded, so pass thread 0
   auto & sync_to_var = _problem_system.getVariable(0, _sync_to_var_name);
 
-  if (sync_to_var.isNodal() || sync_to_var.feType().order != 1)
+  if (sync_to_var.isNodal() || sync_to_var.feType().order != 0)
   {
-    throw MooseException("MooseVariable passed to AscotProblem is nodal or of order >1. It must be "
-                         "elemental and order 1.");
+    throw MooseException(
+        "MooseVariable passed to AscotProblem is nodal or of order > 0. It must be "
+        "elemental and order 0 (i.e. CONSTANT).");
   }
 
   // Get solution from ASCOT5 run
@@ -93,20 +92,20 @@ AscotProblem::syncSolutions(Direction direction)
     MeshBase & to_mesh = mesh().getMesh();
 
     dof_id_type dof_i;
-    // TODO there should be a fairly trivial 1:1 mapping here, but even so it
-    // might be safer to go through the mesh elemental DoF indicies
+    // Although there is a fairly trivial 1:1 mapping here between mesh element
+    // id and dof index, it is safer to explicitly get the dof indicies from the
+    // active mesh elements
     for (const auto & el : to_mesh.active_local_element_ptr_range())
     {
       dof_i = el->dof_number(sync_to_var.sys().number(), sync_to_var.number(), 0);
+      // TODO make this heading coloured
+      _console << "Heat flux mapping from ASCOT5 HDF5" << std::endl;
+      _console << "==================================" << std::endl;
       _console << "el_dof: " << dof_i << ", el_id: " << el->id()
                << ", flux: " << heat_fluxes[el->id()] << std::endl;
       sync_to_var.sys().solution().set(dof_i, heat_fluxes[el->id()]);
     }
 
-    // Close and update solution to ensure consistency with other processes
-    // TODO for some reason, the AuxVariable is not getting picked up in unit test, nor in Exodus
-    // output from a full run. Is this to do with the fact that I don't have a nonlinear Variable
-    // and therefore no System?
     sync_to_var.sys().solution().close();
     sync_to_var.sys().update();
   }
