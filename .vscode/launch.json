@@ -2,6 +2,15 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: a5wall_to_gmsh",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": ["simple_run.h5"],
+            "cwd": "${workspaceFolder}/supplementary/ascot5"
+        },
+        {
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",

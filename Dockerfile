@@ -31,7 +31,8 @@ RUN pip install ascot5-python/a5py
 ###################################
 FROM ascot5-moose-ubuntu AS phaethon-deps
 
-RUN pip install meshio[all] click
+# TODO put a requirements.txt file in repo instead of listing these here
+RUN pip install meshio[all] click jupyter
 
 ##################################
 # Phaethon Development Environment
@@ -51,13 +52,17 @@ ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 RUN cd test && make -j4 && ./run_tests -j4
 RUN cd modules && make -j4 && ./run_tests -j4
 
-RUN apt-get -y install clang-format curl
+RUN apt-get -y install clang-format curl hdf5-tools
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && \
     apt-get -y install git-lfs && \
     git lfs install
 
 ENV OMPI_ALLOW_RUN_AS_ROOT=
 ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=
+
+# Python dev deps
+RUN python -m pip install -U flake8 --user
+ENV PATH="/root/.local/bin:${PATH}"
 
 # Add a non-root user so git works inside the dev container
 ARG USERNAME=vscode

@@ -70,6 +70,17 @@ public:
   static std::vector<int64_t> getWallTileHits(H5::Group & endstate_group);
 
   /**
+   * @brief Get the Marker Weights
+   *
+   * The "weight" of a marker represents the rate of particles tracked for this
+   * time step
+   *
+   * @param endstate_group the HDF5 group object for the active endstate.
+   * @return std::vector<double_t> the marker weights in units of markers/s.
+   */
+  static std::vector<double_t> getMarkerWeights(H5::Group & endstate_group);
+
+  /**
    * @brief Get the Particle Energies
    *
    * @param endstate_group the HDF5 group object for the active endstate.
@@ -86,11 +97,24 @@ public:
    */
   static double_t calculateRelativisticEnergy(double_t mass, std::vector<double_t> velocity);
 
+  /**
+   * @brief Calculate the heat flux values on each element of the mesh
+   *
+   * @param walltile the mesh element index that each marker has hit
+   * @param energies the energies of the markers in Joules
+   * @param weights the marker weights in units of markers/s
+   * @return std::vector<double_t> the heat flux incident on each element of the wall mesh in units
+   * of W/m^2
+   */
+  std::vector<double_t> calculateHeatFluxes(std::vector<int64_t> walltile,
+                                            std::vector<double_t> energies,
+                                            std::vector<double_t> weights);
+
 private:
   /// The name of the AuxVariable to transfer to
   const VariableName & _sync_to_var_name;
   /// The Auxiliary system in which the heat flux values will be stored
-  System & _problem_system;
+  AuxiliarySystem & _problem_system;
   /// The HDF5 file that is both the ASCOT5 input and output
   const H5std_string _ascot5_file_name;
   H5::H5File _ascot5_file;

@@ -12,4 +12,9 @@ ascot5_main --in simple_run
 
 # Generate dummy mesh for use in MOOSE app
 
-./a5wall_to_gmsh.py simple_run.h5
+./a5wall_convert.py simple_run.h5 
+
+# Create other unit test data
+
+python calculate_simple_run_particle_energies.py
+python calculate_simple_run_heat_fluxes.py
