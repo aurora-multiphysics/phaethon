@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.rst": "restructuredtext",
         "*.C": "cpp",
         "*.h": "cpp",
         "cmath": "cpp",
@@ -12,7 +13,8 @@
         "shared_mutex": "cpp",
         "sstream": "cpp",
         "streambuf": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "*.csv": "cpp"
     },
     "python.linting.flake8Enabled": true,
     "python.linting.enabled": true,
