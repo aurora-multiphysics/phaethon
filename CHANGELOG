@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.3.0 (2021-11-08)
+
+### Added
+
+- Ability to obtain heat flux values from an ASCOT5 run. These values are stored in an AuxVariable that is available to MOOSE.
+
 ## v0.2.0 (2021-10-06)
 
 Obligatory release for STEP cycle.
