@@ -10,6 +10,7 @@
 // MOOSE includes
 #include "AscotProblem.h"
 #include "AuxiliarySystem.h"
+#include "ascot5_main.h"
 #include <algorithm>
 using namespace H5;
 
@@ -99,10 +100,10 @@ AscotProblem::syncSolutions(Direction direction)
     {
       dof_i = el->dof_number(sync_to_var.sys().number(), sync_to_var.number(), 0);
       // TODO make this heading coloured
-      _console << "Heat flux mapping from ASCOT5 HDF5" << std::endl;
-      _console << "==================================" << std::endl;
-      _console << "el_dof: " << dof_i << ", el_id: " << el->id()
-               << ", flux: " << heat_fluxes[el->id()] << std::endl;
+      //_console << "Heat flux mapping from ASCOT5 HDF5" << std::endl;
+      //_console << "==================================" << std::endl;
+      //_console << "el_dof: " << dof_i << ", el_id: " << el->id()
+      //         << ", flux: " << heat_fluxes[el->id()] << std::endl;
       sync_to_var.sys().solution().set(dof_i, heat_fluxes[el->id()]);
     }
 
