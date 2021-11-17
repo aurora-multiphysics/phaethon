@@ -57,6 +57,15 @@ ADDITIONAL_INCLUDES := -I/usr/include/hdf5/serial
 ADDITIONAL_LIBS     := -lhdf5_hl_cpp -lhdf5_cpp -lhdf5_serial_hl -lhdf5_serial
 endif
 
+# ASCOT5
+ADDITIONAL_DEPEND_LIBS += libascot_main
+ADDITIONAL_LIBS += -L$(CURDIR)/ascot5 -lascot_main
+ADDITIONAL_INCLUDES += -I$(CURDIR)/ascot5/include
+ASCOT5_OPT = "NOGIT=true CC=h5cc MPI=0 FLAGS=-foffload=disable"
+
+libascot_main:
+	$(MAKE) $(ASCOT5_OPT) -C ascot5 libascot_main
+
 # dep apps
 APPLICATION_DIR    := $(CURDIR)
 APPLICATION_NAME   := phaethon

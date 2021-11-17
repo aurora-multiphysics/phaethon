@@ -10,8 +10,11 @@
 // MOOSE includes
 #include "AscotProblem.h"
 #include "AuxiliarySystem.h"
-#include "ascot5_main.h"
 #include <algorithm>
+namespace ascot5
+{
+#include "ascot5_main.h"
+}
 using namespace H5;
 
 registerMooseObject("PhaethonApp", AscotProblem);
