@@ -13,7 +13,7 @@ endif
 # ASCOT5
 ASCOT5_DIR := $(APPLICATION_DIR)/ascot5
 ADDITIONAL_DEPEND_LIBS += libascot_main
-ADDITIONAL_LIBS += -L$(ASCOT5_DIR) -lascot_main
+ADDITIONAL_LIBS += -Wl,-rpath=$(ASCOT5_DIR) -L$(ASCOT5_DIR) -lascot_main
 ADDITIONAL_INCLUDES += -I$(ASCOT5_DIR)/include
 ASCOT5_OPT := "NOGIT=true CC=h5cc MPI=0 FLAGS=-foffload=disable"
 
