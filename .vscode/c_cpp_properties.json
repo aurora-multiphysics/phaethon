@@ -4,6 +4,7 @@
             "name": "MOOSE-Linux",
             "includePath": [
                 "${workspaceFolder}",
+                "${workspaceFolder}/ascot5/include",
                 "${workspaceFolder}/build/header_symlinks",
                 "${workspaceFolder}/unit/build/header_symlinks",
                 "${MOOSE_DIR}/framework/build/header_symlinks",
@@ -24,6 +25,7 @@
             "browse": {
                 "path": [
                     "${workspaceFolder}",
+                    "${workspaceFolder}/ascot5/include",
                     "${workspaceFolder}/build/header_symlinks",
                     "${workspaceFolder}/unit/build/header_symlinks",
                     "${MOOSE_DIR}/framework/build/header_symlinks",

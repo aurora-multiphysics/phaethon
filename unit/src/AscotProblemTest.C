@@ -130,7 +130,6 @@ TEST_F(AscotProblemHDF5Test, check_auxvariable)
 }
 */
 
-// TODO need to get this test passing
 TEST_F(AscotProblemHDF5Test, check_solution_sync)
 {
   ASSERT_FALSE(appIsNull);
@@ -148,4 +147,9 @@ TEST_F(AscotProblemHDF5Test, check_solution_sync)
     dof_i = el->dof_number(auxvar_heat_fluxes.sys().number(), auxvar_heat_fluxes.number(), 0);
     ASSERT_NEAR(auxvar_heat_fluxes.sys().solution().el(dof_i), simple_run_hfluxes[id], tol);
   }
+}
+
+TEST_F(AscotProblemSimpleRunTest, exectute_simple_run)
+{
+  ASSERT_NO_THROW(problemPtr->externalSolve());
 }

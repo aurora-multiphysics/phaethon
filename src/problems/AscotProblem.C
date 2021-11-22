@@ -52,7 +52,7 @@ void
 AscotProblem::externalSolve()
 {
   // TODO call ASCOT5
-  return;
+  throw MooseException("Testing external solve.");
 }
 
 void
