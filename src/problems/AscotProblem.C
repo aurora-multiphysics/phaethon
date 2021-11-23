@@ -11,6 +11,7 @@
 #include "AscotProblem.h"
 #include "AuxiliarySystem.h"
 #include <algorithm>
+#include <filesystem>
 namespace ascot5
 {
 #include "ascot5_main.h"
@@ -51,8 +52,19 @@ AscotProblem::converged()
 void
 AscotProblem::externalSolve()
 {
-  // TODO call ASCOT5
-  throw MooseException("Testing external solve.");
+  // Compose the input arguments to ASCOT5
+  int argc = 2;
+  std::string ascot5_input = "--in=" + _ascot5_file_name;
+  const char * argv[2] = {"ascot5", ascot5_input.c_str()};
+  try
+  {
+    ascot5::ascot5_main(argc, (char **)argv);
+  }
+  catch (const std::exception & e)
+  {
+    std::cerr << e.what() << '\n';
+    throw MooseException(e.what());
+  }
 }
 
 void
