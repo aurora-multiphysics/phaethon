@@ -60,24 +60,13 @@ protected:
 class AscotProblemSimpleRunTest : public AscotProblemTest
 {
 protected:
-  AscotProblemSimpleRunTest() : AscotProblemTest("ascot_simple_run.i"){};
-
-  virtual void SetUp() override
+  AscotProblemSimpleRunTest() : AscotProblemTest("ascot_simple_run.i")
   {
-    // Call the base class method
-    EXPECT_NO_THROW(AscotProblemTest::SetUp());
-
     // Copy the simple_run HDF5 file that will be used a temp file for this run
-    std::filesystem::copy_file("inputs/simple_run.h5", hdf5_file_name);
-  }
+    std::filesystem::copy_file("inputs/simple_run_quick_input.h5", hdf5_file_name);
+  };
 
-  virtual void TearDown() override
-  {
-    std::filesystem::remove(hdf5_file_name);
+  ~AscotProblemSimpleRunTest() { std::filesystem::remove(hdf5_file_name); }
 
-    // Call the base class method
-    EXPECT_NO_THROW(AscotProblemTest::TearDown());
-  }
-
-  const std::string hdf5_file_name = "inputs/simple_run_test.h5";
+  const std::string hdf5_file_name = "inputs/simple_run_quick_test.h5";
 };

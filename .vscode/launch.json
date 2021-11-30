@@ -38,14 +38,14 @@
             }
         },
         {
-            "name": "(lldb) Unit Test Launch",
+            "name": "(gdb) Unit Test Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/unit/phaethon-unit-dbg",
+            "program": "${workspaceFolder}/unit/phaethon-unit-devel",
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": true,
+            "cwd": "${workspaceFolder}/unit",
+            "environment": [{"name": "ASAN_OPTIONS", "value": "alloc_dealloc_mismatch=0"}],
+            "externalConsole": false,
             "MIMode": "gdb",
             "logging": {
                 "trace": true,

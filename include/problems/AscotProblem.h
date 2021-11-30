@@ -116,6 +116,6 @@ private:
   /// The Auxiliary system in which the heat flux values will be stored
   AuxiliarySystem & _problem_system;
   /// The HDF5 file that is both the ASCOT5 input and output
-  const H5std_string _ascot5_file_name;
+  const FileName & _ascot5_file_name;
   H5::H5File _ascot5_file;
 };

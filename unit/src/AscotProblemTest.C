@@ -18,14 +18,29 @@ using namespace H5;
 std::vector<int64_t> simple_run_walltile{
 #include "../../../supplementary/ascot5/walltile.csv"
 };
+std::vector<int64_t> simple_run_quick_walltile{
+#include "../../../supplementary/ascot5/walltile_quick.csv"
+};
 std::vector<double_t> simple_run_energy{
 #include "../../../supplementary/ascot5/simple_run_energies.csv"
 };
 std::vector<double_t> simple_run_weight{
 #include "../../../supplementary/ascot5/weight.csv"
 };
+std::vector<double_t> simple_run_quick_weight{
+#include "../../../supplementary/ascot5/weight_quick.csv"
+};
 std::vector<double_t> simple_run_hfluxes{
 #include "../../../supplementary/ascot5/simple_run_heat_fluxes.csv"
+};
+std::vector<double_t> simple_run_quick_vr{
+#include "../../../supplementary/ascot5/vr_quick.csv"
+};
+std::vector<double_t> simple_run_quick_vphi{
+#include "../../../supplementary/ascot5/vphi_quick.csv"
+};
+std::vector<double_t> simple_run_quick_vz{
+#include "../../../supplementary/ascot5/vz_quick.csv"
 };
 
 // Tests
@@ -149,7 +164,9 @@ TEST_F(AscotProblemHDF5Test, check_solution_sync)
   }
 }
 
-TEST_F(AscotProblemSimpleRunTest, exectute_simple_run)
+TEST_F(AscotProblemSimpleRunTest, ExectuteSimpleRun)
 {
   ASSERT_NO_THROW(problemPtr->externalSolve());
 }
+
+TEST_F(AscotProblemSimpleRunTest, VerifySimpleRun) { ASSERT_NO_THROW(problemPtr->externalSolve()); }

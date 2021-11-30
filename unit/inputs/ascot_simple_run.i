@@ -7,7 +7,7 @@
 [Problem]
   type = AscotProblem
   sync_variable = fi_heat_flux
-  ascot5_file = 'simple_run_test'
+  ascot5_file = 'simple_run_quick_test'
 []
 
 [AuxVariables]
