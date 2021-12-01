@@ -169,4 +169,49 @@ TEST_F(AscotProblemSimpleRunTest, ExectuteSimpleRun)
   ASSERT_NO_THROW(problemPtr->externalSolve());
 }
 
-TEST_F(AscotProblemSimpleRunTest, VerifySimpleRun) { ASSERT_NO_THROW(problemPtr->externalSolve()); }
+TEST_F(AscotProblemSimpleRunTest, VerifySimpleRun)
+{
+  ASSERT_NO_THROW(problemPtr->externalSolve());
+
+  // Open open output file and relevant group
+  H5File ascot5_file(hdf5_file_name, H5F_ACC_RDONLY);
+  Group ascot5_active_endstate = problemPtr->getActiveEndstate(ascot5_file);
+
+  // Get relevant output data for verification
+  std::vector<int64_t> walltile = problemPtr->getWallTileHits(ascot5_active_endstate);
+  std::vector<double_t> weights = problemPtr->getMarkerWeights(ascot5_active_endstate);
+
+  for (size_t i = 0; i < walltile.size(); i++)
+  {
+    // This is an unfortunate allowance that needs to be made for a variation in
+    // the walltile hits seen for this run.
+    ASSERT_NEAR(walltile[i], simple_run_quick_walltile[i], 1.0);
+    ASSERT_DOUBLE_EQ(weights[i], simple_run_quick_weight[i]);
+  }
+
+  /* There is a lot of variability in the velocities between runs. Need to
+   * consult with ASCOT experts about why this is the case if the walltile hits
+   * always seem to agree. Commenting out for now.
+   *
+  // The velocities don't have their own read routine, so do some repetition of code here
+  // TODO this should be put into a class method of AscotProblem
+  std::unordered_map<std::string, std::vector<double_t>> velocities;
+  std::unordered_map<std::string, std::vector<double_t>> simple_quick_vel = {
+      {"vr", simple_run_quick_vr}, {"vphi", simple_run_quick_vphi}, {"vz", simple_run_quick_vz}};
+  std::vector<std::string> velocity_names{"vr", "vphi", "vz"};
+  double_t tol;
+
+  for (auto && name : velocity_names)
+  {
+    velocities[name].resize(100);
+    DataSet v_dataset = ascot5_active_endstate.openDataSet(name);
+    v_dataset.read(velocities[name].data(), PredType::NATIVE_DOUBLE);
+
+    for (size_t i = 0; i < velocities[name].size(); i++)
+    {
+      tol = simple_quick_vel[name][i] * 0.001;
+      ASSERT_NEAR(velocities[name][i], simple_quick_vel[name][i], tol);
+    }
+  }
+  */
+}
