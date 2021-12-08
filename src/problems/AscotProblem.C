@@ -89,6 +89,18 @@ AscotProblem::syncSolutions(Direction direction)
         "elemental and order 0 (i.e. CONSTANT).");
   }
 
+  // Send input for current time step to ASCOT5
+  if (direction == Direction::TO_EXTERNAL_APP)
+  {
+    // Open the HDF5 file and relevant groups (options and markers)
+    //  - Will probably also need to set the active groups here if it hasn't been done yet... where
+    //  should it be done?
+    //  - Active input and marker groups should probably be set during initialisation of this class
+    //  object since they will stay the same throughout
+
+    // Write the end time for the ASCOT5 run, which is the current time step size
+  }
+
   // Get solution from ASCOT5 run
   if (direction == Direction::FROM_EXTERNAL_APP)
   {
