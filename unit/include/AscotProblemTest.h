@@ -64,9 +64,14 @@ protected:
   {
     // Copy the simple_run HDF5 file that will be used a temp file for this run
     std::filesystem::copy_file("inputs/simple_run_quick_input.h5", hdf5_file_name);
+    setenv("OMP_NUM_THREADS", "1", 1);
   };
 
-  ~AscotProblemSimpleRunTest() { std::filesystem::remove(hdf5_file_name); }
+  ~AscotProblemSimpleRunTest()
+  {
+    std::filesystem::remove(hdf5_file_name);
+    unsetenv("OMP_NUM_THREADS");
+  };
 
   const std::string hdf5_file_name = "inputs/simple_run_quick_test.h5";
 };

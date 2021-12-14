@@ -185,16 +185,12 @@ TEST_F(AscotProblemSimpleRunTest, VerifySimpleRun)
   {
     // This is an unfortunate allowance that needs to be made for a variation in
     // the walltile hits seen for this run.
-    ASSERT_NEAR(walltile[i], simple_run_quick_walltile[i], 1.0);
+    ASSERT_EQ(walltile[i], simple_run_quick_walltile[i]);
     ASSERT_DOUBLE_EQ(weights[i], simple_run_quick_weight[i]);
   }
 
-  /* There is a lot of variability in the velocities between runs. Need to
-   * consult with ASCOT experts about why this is the case if the walltile hits
-   * always seem to agree. Commenting out for now.
-   *
   // The velocities don't have their own read routine, so do some repetition of code here
-  // TODO this should be put into a class method of AscotProblem
+  // TODO this should be put into a class method of AscotProblem or a separate HDF5 wrapper class
   std::unordered_map<std::string, std::vector<double_t>> velocities;
   std::unordered_map<std::string, std::vector<double_t>> simple_quick_vel = {
       {"vr", simple_run_quick_vr}, {"vphi", simple_run_quick_vphi}, {"vz", simple_run_quick_vz}};
@@ -209,9 +205,8 @@ TEST_F(AscotProblemSimpleRunTest, VerifySimpleRun)
 
     for (size_t i = 0; i < velocities[name].size(); i++)
     {
-      tol = simple_quick_vel[name][i] * 0.001;
+      tol = abs(simple_quick_vel[name][i] * 0.001);
       ASSERT_NEAR(velocities[name][i], simple_quick_vel[name][i], tol);
     }
   }
-  */
 }

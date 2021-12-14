@@ -22,7 +22,6 @@ case $OPTION in
         ;;
     
     simplerun_quick)
-        echo "Made it"
         # Generate input file
         python simple_run_quick.py
         cp simple_run_quick.h5 simple_run_quick_input.h5
