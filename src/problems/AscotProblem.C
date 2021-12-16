@@ -97,7 +97,7 @@ AscotProblem::syncSolutions(Direction direction)
   {
     // Open ASCOT5 file and relevant groups for writing
     H5File ascot5_file(_ascot5_file_name, H5F_ACC_RDWR);
-    Group ascot5_marker = getAscotH5Group(ascot5_file, "marker");
+    Group ascot5_options = getAscotH5Group(ascot5_file, "options");
 
     // Open the HDF5 file and relevant groups (options and markers)
     //  - Will probably also need to set the active groups here if it hasn't been done yet... where
@@ -149,28 +149,7 @@ AscotProblem::syncSolutions(Direction direction)
 Group
 AscotProblem::getActiveEndstate(const H5File & hdf5_file)
 {
-  // Open the results group
-  Group results_group = hdf5_file.openGroup("results");
-
-  // Check if the attribute 'active' is present
-  if (results_group.attrExists("active"))
-  {
-    // Open the attribute
-    H5::Attribute results_active_attr = results_group.openAttribute("active");
-    // Get its string type
-    StrType stype = results_active_attr.getStrType();
-    // Read the active run number into a string buffer
-    std::string active_result_num;
-    results_active_attr.read(stype, active_result_num);
-    // Open the active run group
-    std::string endstate_name = "run_" + active_result_num + "/endstate";
-    Group endstate_group = results_group.openGroup(endstate_name);
-    return endstate_group;
-  }
-  else
-  {
-    throw MooseException("ASCOT5 HDF5 File missing 'active' attribute.");
-  }
+  return getAscotH5Group(hdf5_file, "results");
 }
 
 Group
@@ -189,8 +168,13 @@ AscotProblem::getAscotH5Group(const H5File & hdf5_file, const std::string & grou
     // Read the active run number into a string buffer
     std::string active_num;
     active_attr.read(stype, active_num);
-    // Open the active run group
-    std::string subgroup_name = hdf5_group_prefix.at(group_name) + "_" + active_num;
+    // Get the name for the group
+    std::string subgroup_name = AscotProblem::hdf5_group_prefix.at(group_name) + "_" + active_num;
+    if (group_name == "results")
+    {
+      subgroup_name.append("/endstate");
+    }
+    // Open the group
     Group active_group = top_group.openGroup(subgroup_name);
     return active_group;
   }
