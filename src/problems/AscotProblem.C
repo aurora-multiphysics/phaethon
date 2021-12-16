@@ -43,6 +43,9 @@ AscotProblem::AscotProblem(const InputParameters & parameters)
 
 AscotProblem::~AscotProblem() {}
 
+const std::unordered_map<std::string, std::string> AscotProblem::hdf5_group_prefix = {
+    {"marker", "prt"}, {"options", "opt"}, {"results", "run"}};
+
 bool
 AscotProblem::converged()
 {
@@ -92,6 +95,10 @@ AscotProblem::syncSolutions(Direction direction)
   // Send input for current time step to ASCOT5
   if (direction == Direction::TO_EXTERNAL_APP)
   {
+    // Open ASCOT5 file and relevant groups for writing
+    H5File ascot5_file(_ascot5_file_name, H5F_ACC_RDWR);
+    Group ascot5_marker = getAscotH5Group(ascot5_file, "marker");
+
     // Open the HDF5 file and relevant groups (options and markers)
     //  - Will probably also need to set the active groups here if it hasn't been done yet... where
     //  should it be done?
@@ -159,6 +166,33 @@ AscotProblem::getActiveEndstate(const H5File & hdf5_file)
     std::string endstate_name = "run_" + active_result_num + "/endstate";
     Group endstate_group = results_group.openGroup(endstate_name);
     return endstate_group;
+  }
+  else
+  {
+    throw MooseException("ASCOT5 HDF5 File missing 'active' attribute.");
+  }
+}
+
+Group
+AscotProblem::getAscotH5Group(const H5File & hdf5_file, const std::string & group_name)
+{
+  // Open the top-level group
+  Group top_group = hdf5_file.openGroup(group_name);
+
+  // Check if the attribute 'active' is present
+  if (top_group.attrExists("active"))
+  {
+    // Open the attribute
+    H5::Attribute active_attr = top_group.openAttribute("active");
+    // Get its string type
+    StrType stype = active_attr.getStrType();
+    // Read the active run number into a string buffer
+    std::string active_num;
+    active_attr.read(stype, active_num);
+    // Open the active run group
+    std::string subgroup_name = hdf5_group_prefix.at(group_name) + "_" + active_num;
+    Group active_group = top_group.openGroup(subgroup_name);
+    return active_group;
   }
   else
   {

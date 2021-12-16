@@ -44,7 +44,7 @@ std::vector<double_t> simple_run_quick_vz{
 };
 
 // Tests
-TEST_F(AscotProblemHDF5Test, check_hdf5)
+TEST_F(AscotProblemHDF5Test, CheckHDF5)
 {
 
   ASSERT_FALSE(appIsNull);
@@ -67,7 +67,21 @@ TEST_F(AscotProblemHDF5Test, check_hdf5)
   ASSERT_EQ(active_result_num, "0069271660");
 }
 
-TEST_F(AscotProblemHDF5Test, read_walltile)
+TEST_F(AscotProblemHDF5Test, getAscotH5Group)
+{
+
+  ASSERT_FALSE(appIsNull);
+  const std::string group_name("options");
+  // Check that the options group is present, then open it
+  ASSERT_TRUE(hdf5_file.nameExists(group_name));
+  Group options_group = problemPtr->getAscotH5Group(hdf5_file, group_name);
+
+  // Check that the group location is as expected
+  ASSERT_EQ(options_group.getObjName(), "/options/opt_3012694174");
+  ASSERT_EQ(options_group.getNumObjs(), (long long unsigned int)79);
+}
+
+TEST_F(AscotProblemHDF5Test, ReadWalltile)
 {
 
   ASSERT_FALSE(appIsNull);
@@ -76,7 +90,7 @@ TEST_F(AscotProblemHDF5Test, read_walltile)
   ASSERT_EQ(problemPtr->getWallTileHits(endstate_group), simple_run_walltile);
 }
 
-TEST_F(AscotProblemHDF5Test, read_weights)
+TEST_F(AscotProblemHDF5Test, ReadWeights)
 {
 
   ASSERT_FALSE(appIsNull);
@@ -90,7 +104,7 @@ TEST_F(AscotProblemHDF5Test, read_weights)
   }
 }
 
-TEST_F(AscotProblemHDF5Test, read_energy)
+TEST_F(AscotProblemHDF5Test, ReadEnergy)
 {
 
   ASSERT_FALSE(appIsNull);
@@ -104,7 +118,7 @@ TEST_F(AscotProblemHDF5Test, read_energy)
   }
 }
 
-TEST_F(AscotProblemHDF5Test, calculate_relativistic_energy)
+TEST_F(AscotProblemHDF5Test, CalculateRelativisticEnergy)
 {
   // velocity components (r, phi, z) in m/s
   std::vector<double_t> velocity{6726950.87616652, -9727805.12233284, 5355264.46022884};
@@ -114,7 +128,7 @@ TEST_F(AscotProblemHDF5Test, calculate_relativistic_energy)
   ASSERT_DOUBLE_EQ(problemPtr->calculateRelativisticEnergy(mass, velocity), 5.605926430766929e-13);
 }
 
-TEST_F(AscotProblemHDF5Test, calculate_heat_fluxes)
+TEST_F(AscotProblemHDF5Test, CalculateHeatFluxes)
 {
 
   ASSERT_FALSE(appIsNull);
@@ -145,7 +159,7 @@ TEST_F(AscotProblemHDF5Test, check_auxvariable)
 }
 */
 
-TEST_F(AscotProblemHDF5Test, check_solution_sync)
+TEST_F(AscotProblemHDF5Test, CheckSolutionSync)
 {
   ASSERT_FALSE(appIsNull);
   problemPtr->syncSolutions(ExternalProblem::Direction::FROM_EXTERNAL_APP);

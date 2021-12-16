@@ -61,6 +61,14 @@ public:
   static H5::Group getActiveEndstate(const H5::H5File & hdf5_file);
 
   /**
+   * @brief Get the Marker Group object
+   *
+   * @param hdf5_file the ASCOT5 HDF5 file with input and output data.
+   * @return H5::Group the HDF5 file group object for the markers
+   */
+  static H5::Group getAscotH5Group(const H5::H5File & hdf5_file, const std::string & group_name);
+
+  /**
    * @brief Get the indices of wall tiles that each particle has collided with
    *
    * @param endstate_group the HDF5 group object for the active endstate.
@@ -118,4 +126,6 @@ private:
   /// The HDF5 file that is both the ASCOT5 input and output
   const FileName & _ascot5_file_name;
   H5::H5File _ascot5_file;
+  /// Mapping for top-level group name to sub-group prefix for ASCOT5 HDF5 file
+  static const std::unordered_map<std::string, std::string> hdf5_group_prefix;
 };
