@@ -149,16 +149,6 @@ TEST_F(AscotProblemHDF5Test, CalculateHeatFluxes)
   }
 }
 
-/*
-TEST_F(AscotProblemHDF5Test, check_auxvariable)
-{
-  // It looks like I need to think more about the distributed nature of the
-  // AuxVariable and mesh. I need to sum over all of the threads and probably
-  // processes?
-  ASSERT_EQ(problemPtr->getAuxiliarySystem()., (unsigned int)400);
-}
-*/
-
 TEST_F(AscotProblemHDF5Test, CheckSolutionSync)
 {
   ASSERT_FALSE(appIsNull);
@@ -223,4 +213,18 @@ TEST_F(AscotProblemSimpleRunTest, VerifySimpleRun)
       ASSERT_NEAR(velocities[name][i], simple_quick_vel[name][i], tol);
     }
   }
+}
+
+TEST_F(AscotProblemSimpleRunTest, CheckTimeStep) { ASSERT_FLOAT_EQ(1e-5, problemPtr->dt()); }
+
+TEST_F(AscotProblemSimpleRunTest, CheckTimeOptionSet)
+{
+  problemPtr->syncSolutions(ExternalProblem::Direction::TO_EXTERNAL_APP);
+
+  H5File ascot5_file(hdf5_file_name, H5F_ACC_RDONLY);
+  Group options = problemPtr->getAscotH5Group(ascot5_file, "options");
+  DataSet endcond_max_simtime = options.openDataSet("ENDCOND_MAX_SIMTIME");
+  double_t set_time[1];
+  endcond_max_simtime.read(set_time, PredType::NATIVE_DOUBLE);
+  ASSERT_FLOAT_EQ(set_time[0], 1e-5);
 }

@@ -18,5 +18,11 @@
 []
 
 [Executioner]
-  type = Steady
+  type = Transient
+  dt = 1e-5
+  num_steps = 1
+[]
+
+[Outputs]
+  console = false
 []

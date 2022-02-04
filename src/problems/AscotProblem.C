@@ -96,16 +96,23 @@ AscotProblem::syncSolutions(Direction direction)
   if (direction == Direction::TO_EXTERNAL_APP)
   {
     // Open ASCOT5 file and relevant groups for writing
-    H5File ascot5_file(_ascot5_file_name, H5F_ACC_RDWR);
+    H5File ascot5_file(_ascot5_file_name + ".h5", H5F_ACC_RDWR);
+    //  Active input and marker groups should probably be set during initialisation of this class
+    //  object since they will stay the same throughout, but fine here for now
     Group ascot5_options = getAscotH5Group(ascot5_file, "options");
 
-    // Open the HDF5 file and relevant groups (options and markers)
-    //  - Will probably also need to set the active groups here if it hasn't been done yet... where
-    //  should it be done?
-    //  - Active input and marker groups should probably be set during initialisation of this class
-    //  object since they will stay the same throughout
-
-    // Write the end time for the ASCOT5 run, which is the current time step size
+    // Catch any exceptions related to writing to HDF5 file
+    try
+    {
+      // Write the end time condition to the options group
+      DataSet endcond_max_simtime = ascot5_options.openDataSet("ENDCOND_MAX_SIMTIME");
+      double_t data[1] = {dt()};
+      endcond_max_simtime.write(data, PredType::NATIVE_DOUBLE);
+    }
+    catch (DataSetIException error)
+    {
+      error.printErrorStack();
+    }
   }
 
   // Get solution from ASCOT5 run
