@@ -29,6 +29,7 @@ case $OPTION in
         ascot5_main --in simple_run_quick
         # Create other unit test data
         python extract_simple_run_quick_results.py
+        python extract_simple_run_quick_endstate.py
         # Tidy up
         rm simple_run_quick.h5
         ;;
