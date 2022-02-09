@@ -18,12 +18,12 @@ integer_data = ('id', 'charge', 'anum', 'znum')
 with open('simple_run_quick_endstate_fp.txt', 'w') as fp_file:
     for field in fp_data:
         data_string = ', '.join([f'{x:e}' for x in endstate.get(field)])
-        dataline = f'{{"{field}": {{{data_string}}}}},\n'
+        dataline = f'{{"{field}", {{{data_string}}}}},\n'
         fp_file.write(dataline)
 
 # Write the fp data to file as a C++ unordered map
 with open('simple_run_quick_endstate_int.txt', 'w') as int_file:
     for field in integer_data:
         data_string = ', '.join([f'{int(x)}' for x in endstate.get(field)])
-        dataline = f'{{"{field}": {{{data_string}}}}},\n'
+        dataline = f'{{"{field}", {{{data_string}}}}},\n'
         int_file.write(dataline)

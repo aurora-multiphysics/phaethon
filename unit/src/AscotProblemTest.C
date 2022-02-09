@@ -42,6 +42,18 @@ std::vector<double_t> simple_run_quick_vphi{
 std::vector<double_t> simple_run_quick_vz{
 #include "../../../supplementary/ascot5/vz_quick.csv"
 };
+std::unordered_map<std::string, std::vector<double_t>> simple_run_quick_endstate_fp = {
+#include "../../../supplementary/ascot5/simple_run_quick_endstate_fp.txt"
+};
+std::unordered_map<std::string, std::vector<double_t>> simple_run_quick_endstate_int = {
+#include "../../../supplementary/ascot5/simple_run_quick_endstate_int.txt"
+};
+
+TEST(CheckMap, CheckMap)
+{
+  ASSERT_FLOAT_EQ(simple_run_quick_endstate_fp["mass"][0], 6.642156e-27);
+  ASSERT_EQ(simple_run_quick_endstate_int["anum"][3], 4);
+}
 
 // Tests
 TEST_F(AscotProblemHDF5Test, CheckHDF5)
@@ -187,8 +199,6 @@ TEST_F(AscotProblemSimpleRunTest, VerifySimpleRun)
 
   for (size_t i = 0; i < walltile.size(); i++)
   {
-    // This is an unfortunate allowance that needs to be made for a variation in
-    // the walltile hits seen for this run.
     ASSERT_EQ(walltile[i], simple_run_quick_walltile[i]);
     ASSERT_DOUBLE_EQ(weights[i], simple_run_quick_weight[i]);
   }
