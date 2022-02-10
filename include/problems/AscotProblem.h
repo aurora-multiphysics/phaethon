@@ -69,6 +69,18 @@ public:
   static H5::Group getAscotH5Group(const H5::H5File & hdf5_file, const std::string & group_name);
 
   /**
+   * @brief Get an Ascot HDF5 Data object
+   *
+   * @tparam T type of the data object
+   * @param endstate_group the group in which the data object sits
+   * @param field_name the name of the data object in the HDF5 file
+   * @return std::vector<T> the data object values
+   */
+  template <class T>
+  static std::vector<T> getAscotH5DataField(H5::Group & endstate_group,
+                                            const std::string & field_name);
+
+  /**
    * @brief Get the indices of wall tiles that each particle has collided with
    *
    * @param endstate_group the HDF5 group object for the active endstate.

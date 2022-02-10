@@ -42,17 +42,17 @@ std::vector<double_t> simple_run_quick_vphi{
 std::vector<double_t> simple_run_quick_vz{
 #include "../../../supplementary/ascot5/vz_quick.csv"
 };
-std::unordered_map<std::string, std::vector<double_t>> simple_run_quick_endstate_fp = {
-#include "../../../supplementary/ascot5/simple_run_quick_endstate_fp.txt"
+std::unordered_map<std::string, std::vector<double_t>> simple_run_endstate_fp = {
+#include "../../../supplementary/ascot5/simple_run_endstate_fp.txt"
 };
-std::unordered_map<std::string, std::vector<double_t>> simple_run_quick_endstate_int = {
-#include "../../../supplementary/ascot5/simple_run_quick_endstate_int.txt"
+std::unordered_map<std::string, std::vector<double_t>> simple_run_endstate_int = {
+#include "../../../supplementary/ascot5/simple_run_endstate_int.txt"
 };
 
 TEST(CheckMap, CheckMap)
 {
-  ASSERT_FLOAT_EQ(simple_run_quick_endstate_fp["mass"][0], 6.642156e-27);
-  ASSERT_EQ(simple_run_quick_endstate_int["anum"][3], 4);
+  ASSERT_FLOAT_EQ(simple_run_endstate_fp["mass"][0], 6.642156e-27);
+  ASSERT_EQ(simple_run_endstate_int["anum"][3], 4);
 }
 
 // Tests

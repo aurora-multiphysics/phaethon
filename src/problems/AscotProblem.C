@@ -191,25 +191,44 @@ AscotProblem::getAscotH5Group(const H5File & hdf5_file, const std::string & grou
   }
 }
 
-std::vector<int64_t>
-AscotProblem::getWallTileHits(Group & endstate_group)
+template <class T>
+std::vector<T>
+AscotProblem::getAscotH5DataField(H5::Group & endstate_group, const std::string & field_name)
 {
-  // Open the walltile dataset
-  DataSet walltile_dataset = endstate_group.openDataSet("walltile");
-  // Get the walltile dataset's data space
-  DataSpace walltile_dataspace = walltile_dataset.getSpace();
-  // check we only have 1 dim
-  if (walltile_dataspace.getSimpleExtentNdims() == 1)
+
+  // Open the datasets to check the number of ions/markers
+  DataSet dataset = endstate_group.openDataSet(field_name);
+  DataSpace dataspace = dataset.getSpace();
+  // Check we only have 1 dim
+  if (dataspace.getSimpleExtentNdims() == 1)
   {
-    hssize_t n_markers = walltile_dataspace.getSimpleExtentNpoints();
-    std::vector<int64_t> walltile(n_markers);
-    walltile_dataset.read(walltile.data(), PredType::NATIVE_INT64);
-    return walltile;
+    const hsize_t n_markers = dataspace.getSimpleExtentNpoints();
+    std::vector<T> marker_data(n_markers);
+    // Map the C++ type to what is expected by HDF5 routines
+    if (typeid(T) == typeid(double_t))
+    {
+      dataset.read(marker_data.data(), PredType::NATIVE_DOUBLE);
+    }
+    if (typeid(T) == typeid(int64_t))
+    {
+      dataset.read(marker_data.data(), PredType::NATIVE_INT64);
+    }
+    else
+    {
+      throw MooseException("Unrecognised data type requested from HDF5 file");
+    }
+    return marker_data;
   }
   else
   {
-    throw MooseException("ASCOT5 HDF5 File walltile dataset of incorrect dim.");
+    throw MooseException("ASCOT5 HDF5 File weight dataset is of incorrect dim.");
   }
+}
+
+std::vector<int64_t>
+AscotProblem::getWallTileHits(Group & endstate_group)
+{
+  return getAscotH5DataField<int64_t>(endstate_group, "walltile");
 }
 
 std::vector<double_t>
