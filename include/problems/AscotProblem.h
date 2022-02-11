@@ -81,6 +81,26 @@ public:
                                             const std::string & field_name);
 
   /**
+   * @brief Get the Double type Ascot Endstate Variables from HDF5 File
+   *
+   * @param endstate_group the HDF5 file group where the endstate lives
+   * @return std::unordered_map<std::string, std::vector<double_t>> the variables of type double_t
+   * in the endstate
+   */
+  static std::unordered_map<std::string, std::vector<double_t>>
+  getAscotH5EndstateDouble(H5::Group & endstate_group);
+
+  /**
+   * @brief Get the Integer type Ascot Endstate Variables from HDF5 File
+   *
+   * @param endstate_group the HDF5 file group where the endstate lives
+   * @return std::unordered_map<std::string, std::vector<double_t>> the variables of type int64_t in
+   * the endstate
+   */
+  static std::unordered_map<std::string, std::vector<int64_t>>
+  getAscotH5EndstateInt(H5::Group & endstate_group);
+
+  /**
    * @brief Get the indices of wall tiles that each particle has collided with
    *
    * @param endstate_group the HDF5 group object for the active endstate.
@@ -140,4 +160,10 @@ private:
   H5::H5File _ascot5_file;
   /// Mapping for top-level group name to sub-group prefix for ASCOT5 HDF5 file
   static const std::unordered_map<std::string, std::string> hdf5_group_prefix;
+  // The HDF5 dataset names that constitute the required endstate variables to restart ASCOT5
+  static const std::vector<std::string> endstate_fields_double;
+  static const std::vector<std::string> endstate_fields_int;
+  // Endstate variables required for restarting ASCOT5
+  std::unordered_map<std::string, std::vector<double_t>> endstate_data_double;
+  std::unordered_map<std::string, std::vector<int64_t>> endstate_data_int;
 };
