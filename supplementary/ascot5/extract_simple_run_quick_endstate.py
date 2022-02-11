@@ -21,7 +21,8 @@ def main(h5file='simple_run.h5'):
     # Write the fp data to file as a C++ unordered map
     with open(basename + '_endstate_fp.txt', 'w') as fp_file:
         for field in fp_data:
-            data_string = ', '.join([f'{x:e}' for x in endstate.get(field)])
+            data_string = ', '.join([f'{x:.18f}' for x in
+                                    endstate.get(field, SI=False)])
             dataline = f'{{"{field}", {{{data_string}}}}},\n'
             fp_file.write(dataline)
 

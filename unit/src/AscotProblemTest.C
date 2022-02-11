@@ -105,6 +105,21 @@ TEST_F(AscotProblemHDF5Test, ReadEndstateInt)
   }
 }
 
+TEST_F(AscotProblemHDF5Test, ReadEndstateDouble)
+{
+  Group endstate_group = problemPtr->getActiveEndstate(hdf5_file);
+  std::unordered_map<std::string, std::vector<double_t>> endstate_data;
+  endstate_data = problemPtr->getAscotH5EndstateDouble(endstate_group);
+
+  for (auto && field : simple_run_endstate_fp)
+  {
+    for (size_t i = 0; i < field.second.size(); i++)
+    {
+      ASSERT_FLOAT_EQ(endstate_data[field.first][i], field.second[i]);
+    }
+  }
+}
+
 TEST_F(AscotProblemHDF5Test, ReadWalltile)
 {
 
