@@ -4,6 +4,7 @@
 import a5py.ascot5io.ascot5 as ascot5
 import sys
 
+
 def main(h5file='simple_run.h5'):
     # Get the endstate results from the HDF5 file
     hdf5 = ascot5.Ascot(h5file)
@@ -11,7 +12,7 @@ def main(h5file='simple_run.h5'):
 
     # Double/floating-point data for endstate
     fp_data = ('mass', 'rprt', 'phiprt', 'zprt', 'vr', 'vphi', 'vz', 'weight',
-            'time')
+               'time')
 
     # Integer data for endstate
     integer_data = ('id', 'charge', 'anum', 'znum')
@@ -27,7 +28,8 @@ def main(h5file='simple_run.h5'):
     # Write the fp data to file as a C++ unordered map
     with open(basename + '_endstate_int.txt', 'w') as int_file:
         for field in integer_data:
-            data_string = ', '.join([f'{int(x)}' for x in endstate.get(field)])
+            data_string = ', '.join([f'{int(x)}' for x in
+                                    endstate.get(field, SI=False)])
             dataline = f'{{"{field}", {{{data_string}}}}},\n'
             int_file.write(dataline)
 

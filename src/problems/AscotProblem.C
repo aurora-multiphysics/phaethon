@@ -48,6 +48,7 @@ const std::unordered_map<std::string, std::string> AscotProblem::hdf5_group_pref
 
 const std::vector<std::string> AscotProblem::endstate_fields_double = {
     "mass", "rprt", "phiprt", "zprt", "vr", "vphi", "vz", "weight", "time"};
+
 const std::vector<std::string> AscotProblem::endstate_fields_int = {"id", "charge", "anum", "znum"};
 
 bool
@@ -232,11 +233,23 @@ AscotProblem::getAscotH5DataField(H5::Group & endstate_group, const std::string 
 std::unordered_map<std::string, std::vector<double_t>>
 AscotProblem::getAscotH5EndstateDouble(H5::Group & endstate_group)
 {
+  std::unordered_map<std::string, std::vector<double_t>> endstate_data;
+  for (auto && field : endstate_fields_double)
+  {
+    endstate_data[field] = getAscotH5DataField<double_t>(endstate_group, field);
+  }
+  return endstate_data;
 }
 
 std::unordered_map<std::string, std::vector<int64_t>>
 AscotProblem::getAscotH5EndstateInt(H5::Group & endstate_group)
 {
+  std::unordered_map<std::string, std::vector<int64_t>> endstate_data;
+  for (auto && field : endstate_fields_int)
+  {
+    endstate_data[field] = getAscotH5DataField<int64_t>(endstate_group, field);
+  }
+  return endstate_data;
 }
 
 std::vector<int64_t>

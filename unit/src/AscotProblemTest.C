@@ -45,7 +45,7 @@ std::vector<double_t> simple_run_quick_vz{
 std::unordered_map<std::string, std::vector<double_t>> simple_run_endstate_fp = {
 #include "../../../supplementary/ascot5/simple_run_endstate_fp.txt"
 };
-std::unordered_map<std::string, std::vector<double_t>> simple_run_endstate_int = {
+std::unordered_map<std::string, std::vector<int64_t>> simple_run_endstate_int = {
 #include "../../../supplementary/ascot5/simple_run_endstate_int.txt"
 };
 
@@ -91,6 +91,18 @@ TEST_F(AscotProblemHDF5Test, getAscotH5Group)
   // Check that the group location is as expected
   ASSERT_EQ(options_group.getObjName(), "/options/opt_3012694174");
   ASSERT_EQ(options_group.getNumObjs(), (long long unsigned int)79);
+}
+
+TEST_F(AscotProblemHDF5Test, ReadEndstateInt)
+{
+  Group endstate_group = problemPtr->getActiveEndstate(hdf5_file);
+  std::unordered_map<std::string, std::vector<int64_t>> endstate_data;
+  endstate_data = problemPtr->getAscotH5EndstateInt(endstate_group);
+
+  for (auto && field : simple_run_endstate_int)
+  {
+    ASSERT_EQ(endstate_data[field.first], field.second);
+  }
 }
 
 TEST_F(AscotProblemHDF5Test, ReadWalltile)

@@ -19,6 +19,7 @@ case $OPTION in
         # Create other unit test data
         python calculate_simple_run_particle_energies.py
         python calculate_simple_run_heat_fluxes.py
+        python extract_simple_run_quick_endstate.py simple_run.h5
         ;;
     
     simplerun_quick)
@@ -29,7 +30,7 @@ case $OPTION in
         ascot5_main --in simple_run_quick
         # Create other unit test data
         python extract_simple_run_quick_results.py
-        python extract_simple_run_quick_endstate.py
+        python extract_simple_run_quick_endstate.py simple_run_quick.h5
         # Tidy up
         rm simple_run_quick.h5
         ;;
