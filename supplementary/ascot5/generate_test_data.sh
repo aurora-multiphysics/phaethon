@@ -20,6 +20,7 @@ case $OPTION in
         python calculate_simple_run_particle_energies.py
         python calculate_simple_run_heat_fluxes.py
         python extract_simple_run_quick_endstate.py simple_run.h5
+        python create_simple_run_endstate2markers.py
         ;;
     
     simplerun_quick)
