@@ -23,11 +23,19 @@ def main(base_file='simple_run.h5', h5file='simple_run_endstate2markers.h5'):
     #   conditions correspond to particles that should no longer be simulated.
     #   You can find the definition of the endconditions in the C source:
     #   `ascot5/endcond.h`
-    state2markers(fn=h5file, markertype='fo', state='endstate', endcond=1)
+    new_marker = state2markers(fn=h5file, markertype='fo', state='endstate',
+                               endcond=1)
 
-    # Trim down h5file so that it takes less space
-    with h5py.File(h5file, mode='a') as file:
+    # Trim down h5file so that it takes less space, and copy the group created
+    # above into the existing marker group so that we can use `h5diff` for
+    # tests
+    with h5py.File(h5file, mode='r+') as file:
         del file['results']
+        marker_group = file['marker']
+        active_marker = 'prt_' + marker_group.attrs['active'].decode('UTF-8')
+        for key in marker_group[new_marker].keys():
+            del marker_group[active_marker][key]
+            marker_group[active_marker][key] = marker_group[new_marker][key]
 
     # Now repack it so that it actually takes less space
     tempfile = 'temp'
@@ -115,7 +123,7 @@ def state2markers(fn, markertype, state, endcond, ids=np.array([0]),
         znum   = a5["znum"][idx]
         weight = a5["weight"][idx]
         time   = a5["time"][idx]
-        mrk_prt.write_hdf5(fn, N, ids, mass, charge,
+        return mrk_prt.write_hdf5(fn, N, ids, mass, charge,
                            R, phi, z, vR, vphi, vz,
                            anum, znum, weight, time)
 
@@ -141,7 +149,7 @@ def state2markers(fn, markertype, state, endcond, ids=np.array([0]),
         energy = mu * B + (0.5 * mass * vpar * vpar) * (AMU2KG * J2EV)
         v = np.sqrt( 2 * ( energy / J2EV ) / (mass * AMU2KG) )
         pitch  = vpar / v
-        mrk_gc.write_hdf5(fn, N, ids, mass, charge,
+        return mrk_gc.write_hdf5(fn, N, ids, mass, charge,
                           R, phi, z, energy, pitch, theta,
                           anum, znum, weight, time)
 
@@ -158,7 +166,7 @@ def state2markers(fn, markertype, state, endcond, ids=np.array([0]),
                           + np.power(a5["vphi"][idx],2)
                           + np.power(a5["vz"][idx],2) )
         pitch  = vpar / v
-        mrk_fl.write_hdf5(fn, N, ids, R, phi, z, pitch,
+        return mrk_fl.write_hdf5(fn, N, ids, R, phi, z, pitch,
                           weight, time)
 
 
