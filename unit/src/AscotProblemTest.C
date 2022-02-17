@@ -49,13 +49,13 @@ std::unordered_map<std::string, std::vector<int64_t>> simple_run_endstate_int = 
 #include "../../../supplementary/ascot5/simple_run_endstate_int.txt"
 };
 
+// Tests
 TEST(CheckMap, CheckMap)
 {
-  ASSERT_FLOAT_EQ(simple_run_endstate_fp["mass"][0], 6.642156e-27);
+  ASSERT_FLOAT_EQ(simple_run_endstate_fp["mass"][0], 4.0);
   ASSERT_EQ(simple_run_endstate_int["anum"][3], 4);
 }
 
-// Tests
 TEST_F(AscotProblemHDF5Test, CheckHDF5)
 {
 
@@ -175,7 +175,6 @@ TEST_F(AscotProblemHDF5Test, CalculateHeatFluxes)
   // check that the mesh is the expected size
   ASSERT_EQ(problemPtr->mesh().nElem(), (unsigned long int)400);
 
-  Group endstate_group = problemPtr->getActiveEndstate(hdf5_file);
   std::vector<double_t> heat_fluxes =
       problemPtr->calculateHeatFluxes(simple_run_walltile, simple_run_energy, simple_run_weight);
 
@@ -205,6 +204,20 @@ TEST_F(AscotProblemHDF5Test, CheckSolutionSync)
     dof_i = el->dof_number(auxvar_heat_fluxes.sys().number(), auxvar_heat_fluxes.number(), 0);
     ASSERT_NEAR(auxvar_heat_fluxes.sys().solution().el(dof_i), simple_run_hfluxes[id], tol);
   }
+}
+
+TEST_F(AscotProblemHDF5WriteTest, Endstate2Marker)
+{
+  // get the endstate group from HDF5 file
+  Group marker_group = problemPtr->getAscotH5Group(hdf5_file, "marker");
+
+  // write the test data to the marker group
+  problemPtr->copyEndstate2MarkerGroup(marker_group);
+
+  // check newly written marker group against reference with `h5diff`
+  // TODO fill in arguments to h5diff
+  int h5diff_result = std::system("h5diff ");
+  ASSERT_TRUE(h5diff_result);
 }
 
 TEST_F(AscotProblemSimpleRunTest, ExectuteSimpleRun)

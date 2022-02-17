@@ -123,6 +123,8 @@ AscotProblem::syncSolutions(Direction direction)
   // Get solution from ASCOT5 run
   if (direction == Direction::FROM_EXTERNAL_APP)
   {
+    // TODO add read of the endstate into class members
+
     // Open ASCOT5 file and relevant group
     H5File ascot5_file(_ascot5_file_name, H5F_ACC_RDONLY);
     Group ascot5_active_endstate = getActiveEndstate(ascot5_file);

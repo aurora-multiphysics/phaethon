@@ -81,6 +81,24 @@ public:
                                             const std::string & field_name);
 
   /**
+   * @brief Set an Ascot HDF5 Data object
+   *
+   * @tparam T type of the data object
+   * @param endstate_group the group to which the data object will be written
+   * @param field_name the name of the data object in the HDF5 file
+   */
+  template <class T>
+  static void setAscotH5DataField(H5::Group & endstate_group, const std::string & field_name);
+
+  /**
+   * @brief Copy the ASCOT5 endstate data members to the marker group in the HDF5 file
+   *
+   * @param marker_group the marker group in the HDF5 file to which the endstate
+   *        is to be copied
+   */
+  static void copyEndstate2MarkerGroup(H5::Group & marker_group);
+
+  /**
    * @brief Get the Double type Ascot Endstate Variables from HDF5 File
    *
    * @param endstate_group the HDF5 file group where the endstate lives
@@ -150,6 +168,10 @@ public:
                                             std::vector<double_t> energies,
                                             std::vector<double_t> weights);
 
+  // Endstate variables required for restarting ASCOT5
+  std::unordered_map<std::string, std::vector<double_t>> endstate_data_double;
+  std::unordered_map<std::string, std::vector<int64_t>> endstate_data_int;
+
 private:
   /// The name of the AuxVariable to transfer to
   const VariableName & _sync_to_var_name;
@@ -163,7 +185,4 @@ private:
   // The HDF5 dataset names that constitute the required endstate variables to restart ASCOT5
   static const std::vector<std::string> endstate_fields_double;
   static const std::vector<std::string> endstate_fields_int;
-  // Endstate variables required for restarting ASCOT5
-  std::unordered_map<std::string, std::vector<double_t>> endstate_data_double;
-  std::unordered_map<std::string, std::vector<int64_t>> endstate_data_int;
 };
