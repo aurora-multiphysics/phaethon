@@ -111,7 +111,7 @@ AscotProblem::syncSolutions(Direction direction)
     {
       // Write the end time condition to the options group
       DataSet endcond_max_simtime = ascot5_options.openDataSet("ENDCOND_MAX_SIMTIME");
-      double_t data[1] = {dt()};
+      double_t data[1] = {time() + dt()};
       endcond_max_simtime.write(data, PredType::NATIVE_DOUBLE);
     }
     catch (DataSetIException error)
@@ -128,6 +128,10 @@ AscotProblem::syncSolutions(Direction direction)
     // Open ASCOT5 file and relevant group
     H5File ascot5_file(_ascot5_file_name, H5F_ACC_RDONLY);
     Group ascot5_active_endstate = getActiveEndstate(ascot5_file);
+
+    // Read relevant endstate variables for restarting ASCOT5
+    endstate_data_double = getAscotH5EndstateDouble(ascot5_active_endstate);
+    endstate_data_int = getAscotH5EndstateInt(ascot5_active_endstate);
 
     // Get particle information
     std::vector<int64_t> walltile = getWallTileHits(ascot5_active_endstate);
@@ -345,4 +349,10 @@ AscotProblem::calculateHeatFluxes(std::vector<int64_t> walltile,
   }
 
   return heat_fluxes;
+}
+
+void
+AscotProblem::copyEndstate2MarkerGroup(H5::Group & marker_group)
+{
+  return;
 }
