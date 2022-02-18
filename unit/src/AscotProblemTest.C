@@ -278,3 +278,24 @@ TEST_F(AscotProblemSimpleRunTest, CheckTimeOptionSet)
   endcond_max_simtime.read(set_time, PredType::NATIVE_DOUBLE);
   ASSERT_FLOAT_EQ(set_time[0], 1e-5);
 }
+
+TEST_F(AscotProblemHDF5Test, ScratchCreateDataset)
+{
+  // Some tinkering to see what is possible with writing the smaller marker data sets
+  H5::H5File h5file("inputs/simple_run_copy.h5", H5F_ACC_RDWR);
+  H5::Group new_group = h5file.createGroup("marker/prt_1");
+  H5::Group marker = h5file.openGroup("marker");
+  H5::Attribute active = marker.openAttribute("active");
+  H5::StrType stype = active.getStrType();
+  active.write(stype, "1");
+  std::string active_num;
+  active.read(stype, active_num);
+  std::cout << active_num << std::endl;
+
+  hsize_t dims[1] = {2};
+  H5::DataSpace anum_space(1, dims);
+  H5::DataSet new_dataset = new_group.createDataSet("anum", PredType::NATIVE_INT64, anum_space);
+  std::cout << new_group.getNumObjs() << std::endl;
+  int64_t anums[2] = {6, 6};
+  new_dataset.write(anums, PredType::NATIVE_INT64);
+}
