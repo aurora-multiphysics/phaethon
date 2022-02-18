@@ -62,7 +62,8 @@ AscotProblem::externalSolve()
 {
   // Compose the input arguments to ASCOT5
   int argc = 2;
-  std::string ascot5_input = "--in=" + _ascot5_file_name;
+  size_t lastindex = _ascot5_file_name.find(".");
+  std::string ascot5_input = "--in=" + _ascot5_file_name.substr(0, lastindex);
   const char * argv[2] = {"ascot5", ascot5_input.c_str()};
   try
   {
@@ -101,7 +102,7 @@ AscotProblem::syncSolutions(Direction direction)
   if (direction == Direction::TO_EXTERNAL_APP)
   {
     // Open ASCOT5 file and relevant groups for writing
-    H5File ascot5_file(_ascot5_file_name + ".h5", H5F_ACC_RDWR);
+    H5File ascot5_file(_ascot5_file_name, H5F_ACC_RDWR);
     //  Active input and marker groups should probably be set during initialisation of this class
     //  object since they will stay the same throughout, but fine here for now
     Group ascot5_options = getAscotH5Group(ascot5_file, "options");
