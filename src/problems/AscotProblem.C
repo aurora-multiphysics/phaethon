@@ -104,8 +104,6 @@ AscotProblem::syncSolutions(Direction direction)
   {
     // Open ASCOT5 file and relevant groups for writing
     H5File ascot5_file(_ascot5_file_name, H5F_ACC_RDWR);
-    //  Active input and marker groups should probably be set during initialisation of this class
-    //  object since they will stay the same throughout, but fine here for now
     Group ascot5_options = getAscotH5Group(ascot5_file, "options");
 
     // Catch any exceptions related to writing to HDF5 file
@@ -115,6 +113,12 @@ AscotProblem::syncSolutions(Direction direction)
       DataSet endcond_max_simtime = ascot5_options.openDataSet("ENDCOND_MAX_SIMTIME");
       double_t data[1] = {time() + dt()};
       endcond_max_simtime.write(data, PredType::NATIVE_DOUBLE);
+      _console << "tstep: " << _t_step << std::endl;
+      // Copy the endstate to the marker group
+      if (_t_step > 1)
+      {
+        copyEndstate2MarkerGroup(ascot5_file);
+      }
     }
     catch (DataSetIException error)
     {
@@ -125,8 +129,6 @@ AscotProblem::syncSolutions(Direction direction)
   // Get solution from ASCOT5 run
   if (direction == Direction::FROM_EXTERNAL_APP)
   {
-    // TODO add read of the endstate into class members
-
     // Open ASCOT5 file and relevant group
     H5File ascot5_file(_ascot5_file_name, H5F_ACC_RDONLY);
     Group ascot5_active_endstate = getActiveEndstate(ascot5_file);
@@ -357,7 +359,9 @@ void
 AscotProblem::copyEndstate2MarkerGroup(const H5File & hdf5_file)
 {
   // create a new marker group for the next time step
-  std::string step_num = std::to_string(_t_step + 1);
+  std::string step_num = std::to_string(_t_step);
+  if (step_num.length() < 10)
+    step_num.insert(step_num.front() == '-' ? 1 : 0, 10 - step_num.length(), '0');
   Group new_marker = hdf5_file.createGroup("marker/prt_" + step_num);
   // adjust the 'active' attribute on the top level marker group
   Group marker = hdf5_file.openGroup("marker");
