@@ -49,7 +49,8 @@ const std::unordered_map<std::string, std::string> AscotProblem::hdf5_group_pref
 const std::vector<std::string> AscotProblem::endstate_fields_double = {
     "mass", "rprt", "phiprt", "zprt", "vr", "vphi", "vz", "weight", "time"};
 
-const std::vector<std::string> AscotProblem::endstate_fields_int = {"id", "charge", "anum", "znum"};
+const std::vector<std::string> AscotProblem::endstate_fields_int = {
+    "id", "charge", "anum", "znum", "endcond"};
 
 bool
 AscotProblem::converged()
@@ -353,7 +354,94 @@ AscotProblem::calculateHeatFluxes(std::vector<int64_t> walltile,
 }
 
 void
-AscotProblem::copyEndstate2MarkerGroup(H5::Group & marker_group)
+AscotProblem::copyEndstate2MarkerGroup(const H5File & hdf5_file)
 {
-  return;
+  // create a new marker group for the next time step
+  std::string step_num = std::to_string(_t_step + 1);
+  Group new_marker = hdf5_file.createGroup("marker/prt_" + step_num);
+  // adjust the 'active' attribute on the top level marker group
+  Group marker = hdf5_file.openGroup("marker");
+  H5::Attribute active = marker.openAttribute("active");
+  StrType stype = active.getStrType();
+  active.write(stype, step_num);
+  // get the number of markers still active
+  std::vector<size_t> valid_indices;
+  // TODO this could undoubtedly be optimised. Performance will be quite poor if
+  // endcond vector is large.
+  for (size_t i = 0; i != endstate_data_int.at("endcond").size(); i++)
+  {
+    // An endcondition of 1 indicates the marker reached the end of the
+    // simulation time. All other endconditions indicate that the marker has
+    // terminated and should no longer be simulated.
+    if (endstate_data_int.at("endcond")[i] == 1)
+    {
+      valid_indices.push_back(i);
+    }
+  }
+  std::vector<int64_t> nmarkers = {(int64_t)valid_indices.size()};
+  // write the number of markers to the new group
+  const int64_t rank = 2;
+  hsize_t dims[rank] = {1, 1};
+  DataSpace data_space(rank, dims);
+  createAndWriteDataset<int64_t>(nmarkers, "n", data_space, new_marker);
+  // set the DataSpace for all other arrays based on the number of markers
+  dims[0] = (hsize_t)nmarkers[0];
+  data_space = DataSpace(rank, dims);
+  // Write double data
+  for (auto && field : endstate_fields_double)
+  {
+    std::vector<double_t> data;
+    // filter the data
+    for (auto && j : valid_indices)
+    {
+      data.push_back(endstate_data_double.at(field)[j]);
+    }
+    createAndWriteDataset<double_t>(data, field, data_space, new_marker);
+  }
+  // Write integer data
+  for (auto && field : endstate_fields_int)
+  {
+    std::vector<int64_t> data;
+    if (field == "endcond")
+    {
+      continue;
+    }
+    // filter the data
+    for (auto && j : valid_indices)
+    {
+      data.push_back(endstate_data_int.at(field)[j]);
+    }
+    createAndWriteDataset<int64_t>(data, field, data_space, new_marker);
+  }
+}
+
+template <class T>
+void
+AscotProblem::createAndWriteDataset(const std::vector<T> & data,
+                                    const std::string & name,
+                                    const DataSpace & data_space,
+                                    const Group & group)
+{
+  const PredType * type = nullptr;
+  if (typeid(T) == typeid(double_t))
+  {
+    type = &PredType::NATIVE_DOUBLE;
+  }
+  else if (typeid(T) == typeid(int64_t))
+  {
+    type = &PredType::NATIVE_INT64;
+  }
+  else
+  {
+    throw MooseException("Unrecognised data type requested from HDF5 file");
+  }
+  // remove the 'prt' substring from some of the field names
+  std::string name_local(name);
+  size_t start = name_local.find("prt");
+  if (start != std::string::npos)
+  {
+    name_local.erase(start, 3);
+  }
+  DataSet dataset = group.createDataSet(name_local, *type, data_space);
+  dataset.write(data.data(), *type);
 }

@@ -106,14 +106,13 @@ protected:
   {
     // Copy the simple_run.h5 HDF5 file. The copy will be written to and then
     // compared against simple_run_endstate2markers.h5
-    std::filesystem::copy_file("inputs/simple_run.h5", hdf5_file_name);
-    H5::H5File hdf5_file(hdf5_file_name, H5F_ACC_RDWR);
+    std::filesystem::copy_file(reference_hdf5, hdf5_file_name);
   };
 
   ~AscotProblemHDF5WriteTest() { std::filesystem::remove(hdf5_file_name); };
 
   const std::string hdf5_file_name = "inputs/simple_run_endstate2markers_test.h5";
-  H5::H5File hdf5_file;
+  const std::string reference_hdf5 = "inputs/simple_run.h5";
 };
 
 class AscotProblemSimpleRunTest : public AscotProblemTimeTest

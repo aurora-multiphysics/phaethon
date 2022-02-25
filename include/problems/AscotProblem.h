@@ -91,12 +91,27 @@ public:
   static void setAscotH5DataField(H5::Group & endstate_group, const std::string & field_name);
 
   /**
+   * @brief Create and write a dataset to an HDF5 group
+   *
+   * @tparam T the type of data
+   * @param data the data to write to the HDF5 DataSet
+   * @param name the name of the data field in the HDF5 file
+   * @param data_space the HDF5 DataSpace for the DataSet
+   * @param group the HDF5 Group in which the DataSet will be created
+   */
+  template <class T>
+  static void createAndWriteDataset(const std::vector<T> & data,
+                                    const std::string & name,
+                                    const H5::DataSpace & data_space,
+                                    const H5::Group & group);
+
+  /**
    * @brief Copy the ASCOT5 endstate data members to the marker group in the HDF5 file
    *
    * @param marker_group the marker group in the HDF5 file to which the endstate
    *        is to be copied
    */
-  static void copyEndstate2MarkerGroup(H5::Group & marker_group);
+  void copyEndstate2MarkerGroup(const H5::H5File & hdf5_file);
 
   /**
    * @brief Get the Double type Ascot Endstate Variables from HDF5 File

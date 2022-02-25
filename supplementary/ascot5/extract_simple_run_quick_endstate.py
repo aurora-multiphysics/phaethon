@@ -15,7 +15,7 @@ def main(h5file='simple_run.h5'):
                'time')
 
     # Integer data for endstate
-    integer_data = ('id', 'charge', 'anum', 'znum')
+    integer_data = ('id', 'charge', 'anum', 'znum', 'endcond')
 
     basename = h5file.split('.')[0]
     # Write the fp data to file as a C++ unordered map
@@ -29,8 +29,12 @@ def main(h5file='simple_run.h5'):
     # Write the fp data to file as a C++ unordered map
     with open(basename + '_endstate_int.txt', 'w') as int_file:
         for field in integer_data:
-            data_string = ', '.join([f'{int(x)}' for x in
-                                    endstate.get(field, SI=False)])
+            endstate_data = endstate.get(field, SI=False)
+            # for some reason, endcond is bit shifted by 2 leftwards in the
+            # python reading routines ¯\_(ツ)_/¯
+            if field == 'endcond':
+                endstate_data = endstate_data >> 2
+            data_string = ', '.join([f'{int(x)}' for x in endstate_data])
             dataline = f'{{"{field}", {{{data_string}}}}},\n'
             int_file.write(dataline)
 

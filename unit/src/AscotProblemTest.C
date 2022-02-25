@@ -208,15 +208,22 @@ TEST_F(AscotProblemHDF5Test, CheckSolutionSync)
 
 TEST_F(AscotProblemHDF5WriteTest, Endstate2Marker)
 {
-  // get the endstate group from HDF5 file
-  Group marker_group = problemPtr->getAscotH5Group(hdf5_file, "marker");
+
+  H5::H5File hdf5_file(hdf5_file_name, H5F_ACC_RDWR);
+  // set the test data in the class
+  problemPtr->endstate_data_double = simple_run_endstate_fp;
+  problemPtr->endstate_data_int = simple_run_endstate_int;
 
   // write the test data to the marker group
-  problemPtr->copyEndstate2MarkerGroup(marker_group);
+  problemPtr->copyEndstate2MarkerGroup(hdf5_file);
+  hdf5_file.close();
 
   // check newly written marker group against reference with `h5diff`
-  // TODO fill in arguments to h5diff
-  int h5diff_result = std::system("h5diff ");
+  // TODO update h5diff arguments
+  int h5diff_result =
+      std::system(("h5diff -cvv " + hdf5_file_name +
+                   " inputs/simple_run_endstate2markers.h5 marker/prt_1 marker/prt_0033994144")
+                      .c_str());
   ASSERT_TRUE(h5diff_result);
 }
 
