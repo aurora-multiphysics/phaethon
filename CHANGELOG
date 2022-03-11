@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## v1.0.0 (2022-03-11)
+
+First functioning prototype!
+
+### Added
+
+- The functionality of driving ASCOT5 over multiple times steps, which required
+  a fairly involved process copying many variable from the endstate to the marker
+  group. This completes the first Phaethon prototype. It should now be possible to
+  incorporate Phaethon as a sub-app that ties into a heat conduction problem,
+  where fluxes provided to the heat conduction problem are from the fast ions.
+
+### Changed
+
+- Some of the test data had to be updated and corrected, and the testing of the
+  HDF5 data produced by ASCOT5 streamlined to handle the more numerous comparisons
+  needed.
+
 ## v0.3.0 (2021-11-08)
 
 ### Added
