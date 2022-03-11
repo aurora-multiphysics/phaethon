@@ -113,7 +113,6 @@ AscotProblem::syncSolutions(Direction direction)
       DataSet endcond_max_simtime = ascot5_options.openDataSet("ENDCOND_MAX_SIMTIME");
       double_t data[1] = {time() + dt()};
       endcond_max_simtime.write(data, PredType::NATIVE_DOUBLE);
-      _console << "tstep: " << _t_step << std::endl;
       // Copy the endstate to the marker group
       if (_t_step > 1)
       {

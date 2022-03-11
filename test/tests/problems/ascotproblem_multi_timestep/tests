@@ -1,0 +1,17 @@
+[Tests]
+  [./setup]
+    type = RunCommand
+    command = "cp simple_run_quick_input.h5 simple_run_test.h5"
+  [../]
+  [./ascotproblem_multi_timestep]
+    type = 'Exodiff'
+    input = 'ascotproblem_multi_timestep.i'
+    exodiff = 'ascotproblem_multi_timestep_out.e'
+    prereq = setup
+  [../]
+  [./teardown]
+    type = RunCommand
+    command = "rm simple_run_test.h5"
+    prereq = ascotproblem_multi_timestep
+  [../]
+[]
