@@ -2,8 +2,10 @@
 
 #include "PhaethonAppTest.h"
 #include "Executioner.h"
+#include "Transient.h"
 #include "FEProblemBase.h"
 #include "AscotProblem.h"
+#include <filesystem>
 
 // Fixture to test the Ascot External Problem
 class AscotProblemTest : public PhaethonAppInputTest
@@ -37,6 +39,47 @@ protected:
   AscotProblem * problemPtr = nullptr;
 };
 
+// Fixture to test the time stepping of the Ascot External Problem
+// TODO unfortunately, it isn't possible to inherit from AscotProblemTest because downcasting of the
+// . So, some duplicate code here.
+class AscotProblemTimeTest : public PhaethonAppInputTest
+{
+protected:
+  AscotProblemTimeTest(std::string inputfile) : PhaethonAppInputTest(inputfile){};
+
+  virtual void SetUp() override
+  {
+
+    // Call the base class method
+    ASSERT_NO_THROW(PhaethonAppInputTest::SetUp());
+
+    ASSERT_FALSE(appIsNull);
+    ASSERT_NO_THROW(app->setupOptions());
+    ASSERT_NO_THROW(app->runInputFile());
+
+    // Get the executioner
+    executionerPtr = dynamic_cast<Transient *>(app->getExecutioner());
+    ASSERT_NE(executionerPtr, nullptr);
+    // This is the bit that throws a seg fault in subclasses.
+    ASSERT_NO_THROW(executionerPtr->init());
+    // Simulate taking a time step
+    ASSERT_NO_THROW(executionerPtr->preExecute());
+    ASSERT_NO_THROW(executionerPtr->incrementStepOrReject());
+    ASSERT_NO_THROW(executionerPtr->preStep());
+    ASSERT_NO_THROW(executionerPtr->computeDT());
+
+    // Get the FE problem
+    problemPtr = dynamic_cast<AscotProblem *>(&(executionerPtr->feProblem()));
+    ASSERT_NE(problemPtr, nullptr);
+
+    // Check type (i.e. make sure this is an AscotProblem)
+    ASSERT_EQ(problemPtr->type(), "AscotProblem");
+  }
+
+  Transient * executionerPtr = nullptr;
+  AscotProblem * problemPtr = nullptr;
+};
+
 class AscotProblemHDF5Test : public AscotProblemTest
 {
 protected:
@@ -54,4 +97,39 @@ protected:
   }
 
   H5::H5File hdf5_file;
+};
+
+class AscotProblemHDF5WriteTest : public AscotProblemTest
+{
+protected:
+  AscotProblemHDF5WriteTest() : AscotProblemTest("ascot_hdf5.i")
+  {
+    // Copy the simple_run.h5 HDF5 file. The copy will be written to and then
+    // compared against simple_run_endstate2markers.h5
+    std::filesystem::copy_file(reference_hdf5, hdf5_file_name);
+  };
+
+  ~AscotProblemHDF5WriteTest() { std::filesystem::remove(hdf5_file_name); };
+
+  const std::string hdf5_file_name = "inputs/simple_run_endstate2markers_test.h5";
+  const std::string reference_hdf5 = "inputs/simple_run.h5";
+};
+
+class AscotProblemSimpleRunTest : public AscotProblemTimeTest
+{
+protected:
+  AscotProblemSimpleRunTest() : AscotProblemTimeTest("ascot_simple_run.i")
+  {
+    // Copy the simple_run HDF5 file that will be used a temp file for this run
+    std::filesystem::copy_file("inputs/simple_run_quick_input.h5", hdf5_file_name);
+    setenv("OMP_NUM_THREADS", "1", 1);
+  };
+
+  ~AscotProblemSimpleRunTest()
+  {
+    std::filesystem::remove(hdf5_file_name);
+    unsetenv("OMP_NUM_THREADS");
+  };
+
+  const std::string hdf5_file_name = "inputs/simple_run_quick_test.h5";
 };

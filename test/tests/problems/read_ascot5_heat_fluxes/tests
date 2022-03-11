@@ -1,7 +1,0 @@
-[Tests]
-  [read_heat_fluxes_main_app]
-    type = 'Exodiff'
-    input = 'read_ascot5_heat_fluxes.i'
-    exodiff = 'read_ascot5_heat_fluxes_out.e'
-  []
-[]

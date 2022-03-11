@@ -7,7 +7,7 @@
 [Problem]
   type = AscotProblem
   sync_variable = fi_heat_flux
-  ascot5_file = 'simple_run.h5'
+  ascot5_file = 'simple_run_test.h5'
 []
 
 [AuxVariables]
@@ -19,7 +19,8 @@
 
 [Executioner]
   type = Transient
-  num_steps = 1
+  dt = 1e-6
+  num_steps = 5
 []
 
 [Outputs]

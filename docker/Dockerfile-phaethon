@@ -4,11 +4,11 @@
 # TODO should probably move away from using submodules. It means the version
 # information of dependencies is scattered, and it would be better to centralise
 # it here.
-ARG MOOSE_BASE=moose-ubuntu-dev MOOSE_VER=2021-09-15
+ARG MOOSE_BASE=moose-ubuntu-dev MOOSE_VER=2021-09-15 USER=dev
 FROM ${MOOSE_BASE}:${MOOSE_VER} AS ascot5-moose-ubuntu
 
 # Basic environment
-ARG USER=dev
+ARG USER
 WORKDIR $HOME
 # Set path to shared library for Python interface to use and other environment
 ENV LD_LIBRARY_PATH=$HOME/ascot5 EDITOR=vim PATH="${HOME}/.local/bin:${PATH}"
@@ -42,7 +42,7 @@ RUN python -m pip install --upgrade meshio[all] click
 FROM phaethon-deps as phaethon-dev
 
 # Some development utilities, including git-lfs
-RUN sudo apt-get -y install clang-format curl hdf5-tools
+RUN sudo apt-get -y install clang-format curl hdf5-tools gdb
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash && \
     sudo apt-get -y install git-lfs && \
     git lfs install
@@ -55,7 +55,10 @@ RUN python -m pip install --upgrade flake8 jupyter
 ##############################
 FROM phaethon-deps as phaethon
 
-WORKDIR /home/phaethon
+ARG USER
+WORKDIR $HOME/phaethon
 COPY ./ ./
-RUN git clean -dfx && make -j4 && make -C unit/ -j4 
-RUN cd unit && ./run_tests
+    
+RUN sudo chown -R ${USER}:${USER} . && git clean -dfx \
+    && make -j4 && make -C unit/ -j4 
+RUN ./run_tests && cd unit && ./run_tests

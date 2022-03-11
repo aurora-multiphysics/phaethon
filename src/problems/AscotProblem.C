@@ -11,6 +11,11 @@
 #include "AscotProblem.h"
 #include "AuxiliarySystem.h"
 #include <algorithm>
+#include <filesystem>
+namespace ascot5
+{
+#include "ascot5_main.h"
+}
 using namespace H5;
 
 registerMooseObject("PhaethonApp", AscotProblem);
@@ -38,6 +43,15 @@ AscotProblem::AscotProblem(const InputParameters & parameters)
 
 AscotProblem::~AscotProblem() {}
 
+const std::unordered_map<std::string, std::string> AscotProblem::hdf5_group_prefix = {
+    {"marker", "prt"}, {"options", "opt"}, {"results", "run"}};
+
+const std::vector<std::string> AscotProblem::endstate_fields_double = {
+    "mass", "rprt", "phiprt", "zprt", "vr", "vphi", "vz", "weight", "time"};
+
+const std::vector<std::string> AscotProblem::endstate_fields_int = {
+    "id", "charge", "anum", "znum", "endcond"};
+
 bool
 AscotProblem::converged()
 {
@@ -47,8 +61,20 @@ AscotProblem::converged()
 void
 AscotProblem::externalSolve()
 {
-  // TODO call ASCOT5
-  return;
+  // Compose the input arguments to ASCOT5
+  int argc = 2;
+  size_t lastindex = _ascot5_file_name.find(".");
+  std::string ascot5_input = "--in=" + _ascot5_file_name.substr(0, lastindex);
+  const char * argv[2] = {"ascot5", ascot5_input.c_str()};
+  try
+  {
+    ascot5::ascot5_main(argc, (char **)argv);
+  }
+  catch (const std::exception & e)
+  {
+    std::cerr << e.what() << '\n';
+    throw MooseException(e.what());
+  }
 }
 
 void
@@ -73,12 +99,42 @@ AscotProblem::syncSolutions(Direction direction)
         "elemental and order 0 (i.e. CONSTANT).");
   }
 
+  // Send input for current time step to ASCOT5
+  if (direction == Direction::TO_EXTERNAL_APP)
+  {
+    // Open ASCOT5 file and relevant groups for writing
+    H5File ascot5_file(_ascot5_file_name, H5F_ACC_RDWR);
+    Group ascot5_options = getAscotH5Group(ascot5_file, "options");
+
+    // Catch any exceptions related to writing to HDF5 file
+    try
+    {
+      // Write the end time condition to the options group
+      DataSet endcond_max_simtime = ascot5_options.openDataSet("ENDCOND_MAX_SIMTIME");
+      double_t data[1] = {time() + dt()};
+      endcond_max_simtime.write(data, PredType::NATIVE_DOUBLE);
+      // Copy the endstate to the marker group
+      if (_t_step > 1)
+      {
+        copyEndstate2MarkerGroup(ascot5_file);
+      }
+    }
+    catch (DataSetIException error)
+    {
+      error.printErrorStack();
+    }
+  }
+
   // Get solution from ASCOT5 run
   if (direction == Direction::FROM_EXTERNAL_APP)
   {
     // Open ASCOT5 file and relevant group
     H5File ascot5_file(_ascot5_file_name, H5F_ACC_RDONLY);
     Group ascot5_active_endstate = getActiveEndstate(ascot5_file);
+
+    // Read relevant endstate variables for restarting ASCOT5
+    endstate_data_double = getAscotH5EndstateDouble(ascot5_active_endstate);
+    endstate_data_int = getAscotH5EndstateInt(ascot5_active_endstate);
 
     // Get particle information
     std::vector<int64_t> walltile = getWallTileHits(ascot5_active_endstate);
@@ -99,10 +155,10 @@ AscotProblem::syncSolutions(Direction direction)
     {
       dof_i = el->dof_number(sync_to_var.sys().number(), sync_to_var.number(), 0);
       // TODO make this heading coloured
-      _console << "Heat flux mapping from ASCOT5 HDF5" << std::endl;
-      _console << "==================================" << std::endl;
-      _console << "el_dof: " << dof_i << ", el_id: " << el->id()
-               << ", flux: " << heat_fluxes[el->id()] << std::endl;
+      //_console << "Heat flux mapping from ASCOT5 HDF5" << std::endl;
+      //_console << "==================================" << std::endl;
+      //_console << "el_dof: " << dof_i << ", el_id: " << el->id()
+      //         << ", flux: " << heat_fluxes[el->id()] << std::endl;
       sync_to_var.sys().solution().set(dof_i, heat_fluxes[el->id()]);
     }
 
@@ -114,23 +170,34 @@ AscotProblem::syncSolutions(Direction direction)
 Group
 AscotProblem::getActiveEndstate(const H5File & hdf5_file)
 {
-  // Open the results group
-  Group results_group = hdf5_file.openGroup("results");
+  return getAscotH5Group(hdf5_file, "results");
+}
+
+Group
+AscotProblem::getAscotH5Group(const H5File & hdf5_file, const std::string & group_name)
+{
+  // Open the top-level group
+  Group top_group = hdf5_file.openGroup(group_name);
 
   // Check if the attribute 'active' is present
-  if (results_group.attrExists("active"))
+  if (top_group.attrExists("active"))
   {
     // Open the attribute
-    H5::Attribute results_active_attr = results_group.openAttribute("active");
+    H5::Attribute active_attr = top_group.openAttribute("active");
     // Get its string type
-    StrType stype = results_active_attr.getStrType();
+    StrType stype = active_attr.getStrType();
     // Read the active run number into a string buffer
-    std::string active_result_num;
-    results_active_attr.read(stype, active_result_num);
-    // Open the active run group
-    std::string endstate_name = "run_" + active_result_num + "/endstate";
-    Group endstate_group = results_group.openGroup(endstate_name);
-    return endstate_group;
+    std::string active_num;
+    active_attr.read(stype, active_num);
+    // Get the name for the group
+    std::string subgroup_name = AscotProblem::hdf5_group_prefix.at(group_name) + "_" + active_num;
+    if (group_name == "results")
+    {
+      subgroup_name.append("/endstate");
+    }
+    // Open the group
+    Group active_group = top_group.openGroup(subgroup_name);
+    return active_group;
   }
   else
   {
@@ -138,46 +205,72 @@ AscotProblem::getActiveEndstate(const H5File & hdf5_file)
   }
 }
 
-std::vector<int64_t>
-AscotProblem::getWallTileHits(Group & endstate_group)
-{
-  // Open the walltile dataset
-  DataSet walltile_dataset = endstate_group.openDataSet("walltile");
-  // Get the walltile dataset's data space
-  DataSpace walltile_dataspace = walltile_dataset.getSpace();
-  // check we only have 1 dim
-  if (walltile_dataspace.getSimpleExtentNdims() == 1)
-  {
-    hssize_t n_markers = walltile_dataspace.getSimpleExtentNpoints();
-    std::vector<int64_t> walltile(n_markers);
-    walltile_dataset.read(walltile.data(), PredType::NATIVE_INT64);
-    return walltile;
-  }
-  else
-  {
-    throw MooseException("ASCOT5 HDF5 File walltile dataset of incorrect dim.");
-  }
-}
-
-std::vector<double_t>
-AscotProblem::getMarkerWeights(Group & endstate_group)
+template <class T>
+std::vector<T>
+AscotProblem::getAscotH5DataField(H5::Group & endstate_group, const std::string & field_name)
 {
 
   // Open the datasets to check the number of ions/markers
-  DataSet weight_dataset = endstate_group.openDataSet("weight");
-  DataSpace weight_dataspace = weight_dataset.getSpace();
+  DataSet dataset = endstate_group.openDataSet(field_name);
+  DataSpace dataspace = dataset.getSpace();
   // Check we only have 1 dim
-  if (weight_dataspace.getSimpleExtentNdims() == 1)
+  if (dataspace.getSimpleExtentNdims() == 1)
   {
-    const hsize_t n_markers = weight_dataspace.getSimpleExtentNpoints();
-    std::vector<double_t> marker_weights(n_markers);
-    weight_dataset.read(marker_weights.data(), PredType::NATIVE_DOUBLE);
-    return marker_weights;
+    const hsize_t n_markers = dataspace.getSimpleExtentNpoints();
+    std::vector<T> marker_data(n_markers);
+    // Map the C++ type to what is expected by HDF5 routines
+    if (typeid(T) == typeid(double_t))
+    {
+      dataset.read(marker_data.data(), PredType::NATIVE_DOUBLE);
+    }
+    else if (typeid(T) == typeid(int64_t))
+    {
+      dataset.read(marker_data.data(), PredType::NATIVE_INT64);
+    }
+    else
+    {
+      throw MooseException("Unrecognised data type requested from HDF5 file");
+    }
+    return marker_data;
   }
   else
   {
     throw MooseException("ASCOT5 HDF5 File weight dataset is of incorrect dim.");
   }
+}
+
+std::unordered_map<std::string, std::vector<double_t>>
+AscotProblem::getAscotH5EndstateDouble(H5::Group & endstate_group)
+{
+  std::unordered_map<std::string, std::vector<double_t>> endstate_data;
+  for (auto && field : endstate_fields_double)
+  {
+    endstate_data[field] = getAscotH5DataField<double_t>(endstate_group, field);
+  }
+  return endstate_data;
+}
+
+std::unordered_map<std::string, std::vector<int64_t>>
+AscotProblem::getAscotH5EndstateInt(H5::Group & endstate_group)
+{
+  std::unordered_map<std::string, std::vector<int64_t>> endstate_data;
+  for (auto && field : endstate_fields_int)
+  {
+    endstate_data[field] = getAscotH5DataField<int64_t>(endstate_group, field);
+  }
+  return endstate_data;
+}
+
+std::vector<int64_t>
+AscotProblem::getWallTileHits(Group & endstate_group)
+{
+  return getAscotH5DataField<int64_t>(endstate_group, "walltile");
+}
+
+std::vector<double_t>
+AscotProblem::getMarkerWeights(Group & endstate_group)
+{
+  return getAscotH5DataField<double_t>(endstate_group, "weight");
 }
 
 std::vector<double_t>
@@ -259,4 +352,99 @@ AscotProblem::calculateHeatFluxes(std::vector<int64_t> walltile,
   }
 
   return heat_fluxes;
+}
+
+void
+AscotProblem::copyEndstate2MarkerGroup(const H5File & hdf5_file)
+{
+  // create a new marker group for the next time step
+  std::string step_num = std::to_string(_t_step);
+  if (step_num.length() < 10)
+    step_num.insert(step_num.front() == '-' ? 1 : 0, 10 - step_num.length(), '0');
+  Group new_marker = hdf5_file.createGroup("marker/prt_" + step_num);
+  // adjust the 'active' attribute on the top level marker group
+  Group marker = hdf5_file.openGroup("marker");
+  H5::Attribute active = marker.openAttribute("active");
+  StrType stype = active.getStrType();
+  active.write(stype, step_num);
+  // get the number of markers still active
+  std::vector<size_t> valid_indices;
+  // TODO this could undoubtedly be optimised. Performance will be quite poor if
+  // endcond vector is large.
+  for (size_t i = 0; i != endstate_data_int.at("endcond").size(); i++)
+  {
+    // An endcondition of 1 indicates the marker reached the end of the
+    // simulation time. All other endconditions indicate that the marker has
+    // terminated and should no longer be simulated.
+    if (endstate_data_int.at("endcond")[i] == 1)
+    {
+      valid_indices.push_back(i);
+    }
+  }
+  std::vector<int64_t> nmarkers = {(int64_t)valid_indices.size()};
+  // write the number of markers to the new group
+  const int64_t rank = 2;
+  hsize_t dims[rank] = {1, 1};
+  DataSpace data_space(rank, dims);
+  createAndWriteDataset<int64_t>(nmarkers, "n", data_space, new_marker);
+  // set the DataSpace for all other arrays based on the number of markers
+  dims[0] = (hsize_t)nmarkers[0];
+  data_space = DataSpace(rank, dims);
+  // Write double data
+  for (auto && field : endstate_fields_double)
+  {
+    std::vector<double_t> data;
+    // filter the data
+    for (auto && j : valid_indices)
+    {
+      data.push_back(endstate_data_double.at(field)[j]);
+    }
+    createAndWriteDataset<double_t>(data, field, data_space, new_marker);
+  }
+  // Write integer data
+  for (auto && field : endstate_fields_int)
+  {
+    std::vector<int64_t> data;
+    if (field == "endcond")
+    {
+      continue;
+    }
+    // filter the data
+    for (auto && j : valid_indices)
+    {
+      data.push_back(endstate_data_int.at(field)[j]);
+    }
+    createAndWriteDataset<int64_t>(data, field, data_space, new_marker);
+  }
+}
+
+template <class T>
+void
+AscotProblem::createAndWriteDataset(const std::vector<T> & data,
+                                    const std::string & name,
+                                    const DataSpace & data_space,
+                                    const Group & group)
+{
+  const PredType * type = nullptr;
+  if (typeid(T) == typeid(double_t))
+  {
+    type = &PredType::NATIVE_DOUBLE;
+  }
+  else if (typeid(T) == typeid(int64_t))
+  {
+    type = &PredType::NATIVE_INT64;
+  }
+  else
+  {
+    throw MooseException("Unrecognised data type requested from HDF5 file");
+  }
+  // remove the 'prt' substring from some of the field names
+  std::string name_local(name);
+  size_t start = name_local.find("prt");
+  if (start != std::string::npos)
+  {
+    name_local.erase(start, 3);
+  }
+  DataSet dataset = group.createDataSet(name_local, *type, data_space);
+  dataset.write(data.data(), *type);
 }
